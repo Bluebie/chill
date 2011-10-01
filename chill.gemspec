@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'chill'
-  s.version = '2'
+  s.version = '3'
   s.require_path = '.'
   s.summary = "A tiny plug to hook ruby in to couchdb"
   s.email = "a@creativepony.com"
