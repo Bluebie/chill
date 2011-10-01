@@ -266,16 +266,21 @@ class ChillDB::List < Array
     self.map { |i| i['value'] }
   end
   
+  def docs
+    self.map { |i| i['doc'] }
+  end
+  
   def each_pair &proc
     self.each { |item| proc.call(item['key'], item['value']) }
   end
   
   # make a regular ruby hash version
-  def to_h
+  # if you want docs as values instead of emitted values, use to_h(:doc)
+  def to_h value = :value
     hash = ChillDB::IndifferentHash.new
     
     each do |item|
-      hash[item['key']] = item['value']
+      hash[item['key']] = item[value.to_s]
     end
     
     return hash
