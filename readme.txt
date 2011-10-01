@@ -28,11 +28,9 @@ KittensApp.template(:cat).merge(
 
 # add a view
 KittensApp.design(:lists).views(
-  soft_cats: {
-    map: 'function(doc) {
-      if (doc.kind == "cat" && softness > 1) emit(doc._id, null);
-    }'
-  }
+  soft_cats: 'function(doc) {
+    if (doc.kind == "cat" && softness > 1) emit(doc._id, null);
+  }'
 ).commit!
 
 # use the view to get a list of non-hard cats

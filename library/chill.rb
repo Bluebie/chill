@@ -323,7 +323,7 @@ class ChillDB::Design
   
   # adds views
   def add_views collection
-    document['views'].merge! collection
+    document['views'].merge! views_preprocess(collection)
     return self
   end
   
@@ -372,6 +372,14 @@ class ChillDB::Design
     return results
   end
   
+  private
+  
+  def views_preprocess views_hash
+    views_hash.each do |key, value|
+      views_hash[key] = { map: value } if value.respond_to? :to_str
+    end
+    return views_hash
+  end
 end
 
 
