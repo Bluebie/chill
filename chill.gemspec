@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'chill'
-  s.version = '4'
+  s.version = '5'
   s.require_path = '.'
   s.summary = "A tiny plug to hook ruby in to couchdb"
   s.email = "a@creativepony.com"
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.files = Dir['library/**.rb']
   s.require_paths = ['library']
   
-  s.add_dependency 'json', '>= 1.6.0'
+  s.add_dependency 'json', '>= 1.0.0'
   s.add_dependency 'rest-client', '>= 1.6.7'
   s.add_dependency 'uuid', '>= 2.3.4'
 end

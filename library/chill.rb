@@ -37,8 +37,12 @@ module ChillDB
 
   # get or make a document with a particular id/name, or just a blank new one
   def document id = false
-    if id
-      ChillDB::Document.load(@@database, id)
+    if id.respond_to? :to_ary
+      list = id.to_ary.map { |i| i.to_s }
+      response = @@database.http('_all_docs?include_docs=true').post({ keys: list }.to_json)
+      ChillDB::List.load(JSON.parse(response), database: @@database)
+    elsif id.respond_to? :to_str
+      ChillDB::Document.load(@@database, id.to_str)
     else
       ChillDB::Document.new(@@database)
     end
@@ -51,6 +55,12 @@ module ChillDB
     hash['_id'] = document
     return hash.commit! if hash.is_a? ChillDB::Document
     return ChillDB::Document.new(@@database, hash).commit!
+  end
+  
+  def open *args
+    headers = { accept: '*/*' }
+    headers.merge! args.pop if args.last.respond_to? :to_hash
+    @@database.http(args.map { |i| URI.escape(i, /[^a-z0-9_.-]/i) }.join('/'), headers)
   end
 end
 
@@ -80,8 +90,8 @@ class ChillDB::Database
   #def revs_limit=(v); http('_revs_limit').put(v.to_s); end
   
   # grab a RestClient http resource for this database
-  def http resource
-    RestClient::Resource.new((@url + resource).to_s, :headers => {accept: 'application/json', content_type: 'application/json'}) { |r| r }
+  def http resource, headers = {}
+    RestClient::Resource.new((@url + resource).to_s, headers: {accept: 'application/json', content_type: 'application/json'}.merge(headers)) { |r| r }
   end
   
   private
@@ -110,7 +120,7 @@ class ChillDB::IndifferentHash < Hash
   
   # getters and setters for hash items
   def method_missing name, *args
-    return self[name.to_s] if self[name.to_s]
+    return self[name.to_s] if self.key? name.to_s
     return self[name.to_s[0...-1]] = args.first if name.to_s.end_with? '=' and args.length == 1
     super
   end
@@ -153,7 +163,7 @@ class ChillDB::IndifferentHash < Hash
   end
   
   def normalize thing
-    return ChillDB::IndifferentHash.new.replace(thing) if thing.is_a? Hash
+    return ChillDB::IndifferentHash.new.replace(thing) if thing.respond_to? :to_hash unless thing.is_a? self.class
     return thing.map { |i| normalize(i) } if thing.is_a? Array
     return thing;
   end
@@ -234,6 +244,11 @@ class ChillDB::Document < ChillDB::IndifferentHash
     json = JSON.parse(request.body)
     json['_revisions']['ids']
   end
+  
+  # for integration with url routers in webapps, to_param defaults to _id - which you can use straight up in urls
+  def to_param
+    self['_id']
+  end
 end
 
 
@@ -244,9 +259,36 @@ end
 class ChillDB::List < Array
   attr_accessor :total_rows, :offset, :database
   
+  # creates a new List from a couchdb response
+  def self.load list, extras = {}
+    new_list = self.new
+    
+    raise "#{list['error']} - #{list['reason']}" if list['error']
+    [extras, list].each do |properties|
+      properties.each do |key, value|
+        new_list.send("#{key}=", value)
+      end
+    end
+    
+    return new_list
+  end
+  
   # store rows nicely in mah belleh
   def rows=(arr)
-    self.replace arr.map { |item| ChillDB::IndifferentHash.new.replace(item) }
+    self.replace(arr.map { |item|
+      if item['value'].is_a? Hash
+        if item['value'].respond_to?(:[]) && item['value']['_id']
+          item['value']['_id'] ||= item['id']
+          item['value'] = ChillDB::Document.new(@database, item['value'])
+        else
+          item['value'] = ChillDB::IndifferentHash.new.replace(item['value'])
+        end
+      end
+      
+      item['doc'] = ChillDB::Document.new(@database, item['doc']) if item['doc']
+      
+      item
+    })
   end
   
   # we are the rows!
@@ -267,11 +309,25 @@ class ChillDB::List < Array
   end
   
   def docs
-    self.map { |i| i['doc'] }
+    self.map { |i| i['doc']  }
   end
   
   def each_pair &proc
     self.each { |item| proc.call(item['key'], item['value']) }
+  end
+  
+  # gets an item by id value
+  def id value
+    self.find { |i| i['id'] == value }['doc']
+  end
+  
+  def key value
+    self.find { |i| i['key'] == value }
+  end
+  
+  def [] key
+    return key(key)['doc'] unless key.respond_to? :to_int
+    super
   end
   
   # make a regular ruby hash version
@@ -285,16 +341,15 @@ class ChillDB::List < Array
     
     return hash
   end
-  alias_method :to_hash, :to_h
   
   # remove all the documents in this list from the database
   def delete_all!
-    each { |item|
-      raise "Not all documents listed are emitted as values in this view" if item.id != item.value._id
-    }
+    each do |item|
+      raise "Some (all?) items in list do not contain _rev properties in their values" unless item['value']['_rev']
+    end
     
     request = { docs: map { |item|
-      { _id: item.value._id, _rev: item.value._rev, _deleted: true }
+      { _id: item['value']['_id'] || item['id'], _rev: item['value']['_rev'], _deleted: true }
     } }
     
     response = JSON.parse @database.http("_bulk_docs").post(request.to_json)
@@ -364,17 +419,9 @@ class ChillDB::Design
     opts = options.map { |key, value| "#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}" }.join('&')
     url = "_design/#{URI.escape @name}/_view/#{URI.escape view.to_s}?#{opts}"
     response = @database.http(url).get()
-    json = JSON.parse response.body
-    raise "#{json['error']} - #{json['reason']} @ #{url}" if json['error']
-
-    # put the results in to a QueryResults object - a glorified array
-    results = ChillDB::List.new
-    results.database = @database
-    json.each do |key, value|
-      results.send("#{key}=", value)
-    end
     
-    return results
+    # put the results in to a QueryResults object - a glorified array
+    return ChillDB::List.load(JSON.parse(response.body), database: @database)
   end
   
   private
