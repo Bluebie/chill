@@ -57,10 +57,35 @@ module ChillDB
     return ChillDB::Document.new(@@database, hash).commit!
   end
   
+  # commit takes an array of documents, and does a bulk commit to the server (one single request)
+  # using a bulk commit is faster than calling commit! on each individual document object
+  def commit! *args
+    list(args.flatten).commit!
+  end
+  
+  def delete! *args
+    list(args.flatten).delete!
+  end
+  
+  # turn an array of documents in to a ChillDB::List
+  def list array = []
+    list = ChillDB::List.from_array array
+    list.database = @@database
+    return list
+  end
+  
+  # all docs!
+  def everything
+    list = ChillDB::List.load(JSON.parse(@@database.http('_all_docs?include_docs=true').get.body))
+    list.database = @@database
+    return list
+  end
+  
+  # open a resource to the server for a particular document, which you can get, post, etc to. For internal use.
   def open *args
     headers = { accept: '*/*' }
     headers.merge! args.pop if args.last.respond_to? :to_hash
-    @@database.http(args.map { |i| URI.escape(i, /[^a-z0-9_.-]/i) }.join('/'), headers)
+    @@database.http(args.map { |item| URI.escape(item, /[^a-z0-9_.-]/i) }.join('/'), headers)
   end
 end
 
@@ -84,6 +109,17 @@ class ChillDB::Database
     request = http('_compact').post('')
     raise request.body unless request.code == 202
     return self
+  end
+  
+  # get info about database
+  def info
+    response = http('').get()
+    IndifferentHash.new.replace(JSON.parse response.body)
+  end
+  
+  # pretty output for debugging things :)
+  def inspect
+    "#<ChillDB::Database: #{info.inspect} >"
   end
   
   #def revs_limit; http('_revs_limit').get.body.to_i; end
@@ -204,6 +240,7 @@ class ChillDB::Document < ChillDB::IndifferentHash
   # returns self, or if there's a more specific subclass, a subclassed version of Document
   def load lookup_revision = nil
     url = URI(URI.escape self['_id'])
+    lookup_revision ||= self['_rev']
     url.query = "rev=#{lookup_revision}" if lookup_revision
     response = @database.http(url).get
     return self if response.code == 404 # we can create it later
@@ -215,6 +252,7 @@ class ChillDB::Document < ChillDB::IndifferentHash
   
   # stores updates (or newly existingness) of document to origin database
   def commit!
+    return delete! if self['_deleted'] # just delete if we're marked for deletion
     json = JSON.generate(self)
     response = @database.http(URI.escape self['_id']).put(json);
     raise response.body unless (200..299).include? response.code
@@ -225,11 +263,17 @@ class ChillDB::Document < ChillDB::IndifferentHash
     return self
   end
   
-  # delete this jerk
+  # mark this jerk for deletion! (useful for bulk commit)
+  def delete
+    self.replace('_id'=> self['_id'], '_rev'=> self['_rev'], '_deleted'=> true)
+  end
+  
+  # delete this jerk immediately
   def delete!
     response = @database.http(URI.escape self['_id']).delete()
     response = ChillDB::IndifferentHash.new.replace JSON.parse(response.body)
     raise "Couldn't delete #{self._id}: #{response.error} - #{response.reason}" if response['error']
+    delete # make our contents be deleted
     return response
   end
   
@@ -248,6 +292,11 @@ class ChillDB::Document < ChillDB::IndifferentHash
   # for integration with url routers in webapps, to_param defaults to _id - which you can use straight up in urls
   def to_param
     self['_id']
+  end
+  
+  # loose equality check
+  def == other_doc
+    other.is_a?(self.class) and (self['_id'] == other['_id']) and (self['_rev'] == other['_rev'])
   end
 end
 
@@ -271,6 +320,14 @@ class ChillDB::List < Array
     end
     
     return new_list
+  end
+  
+  # to make a list from a simple array (not a couchdb response...)
+  def self.from_array array
+    new_list = self.new
+    new_list.replace array.map do |item|
+      { 'id'=> item['_id'], 'key'=> item['_id'], 'value'=> item, 'doc'=> item }
+    end
   end
   
   # store rows nicely in mah belleh
@@ -342,21 +399,60 @@ class ChillDB::List < Array
     return hash
   end
   
+  # commit takes an array of documents, and does a bulk commit to the server (one single request)
+  # using a bulk commit is faster than calling commit! on each individual document object
+  def commit!
+    commit_documents! convert
+  end
+  alias_method :commit_all!, :commit!
+  
   # remove all the documents in this list from the database
-  def delete_all!
+  def delete!
+    # check all the entries have a _rev - if they don't they cannot be deleted!
     each do |item|
-      raise "Some (all?) items in list do not contain _rev properties in their values" unless item['value']['_rev']
+      rev = item['value']['_rev'] || item['value']['rev'] || item['doc']['_rev']
+      raise "Some (all?) items in list do not contain _rev properties in their values" unless rev
     end
     
-    request = { docs: map { |item|
-      { _id: item['value']['_id'] || item['id'], _rev: item['value']['_rev'], _deleted: true }
-    } }
-    
-    response = JSON.parse @database.http("_bulk_docs").post(request.to_json)
-    raise "Error: #{response['error']} - #{response['reason']}" if response.is_a? Hash and response['error']
-    
-    return ChillDB::IndifferentHash.new.replace response
+    # mark all documents for deletion and commit the order!
+    commit_documents! convert.map { |item| item.delete }
   end
+  
+  alias_method :delete_all!, :delete!
+  
+  private
+  # get the list, with any non-ChillDB::Document's converted in to those
+  def convert
+    map do |item|
+      document = item['doc'] || item['value']
+      if document.is_a? ChillDB::Document
+        document
+      elsif document.respond_to? :to_hash
+        document['_rev'] ||= item['value']['_rev'] || item['value']['rev'] || item['doc']['_rev']
+        document = ChillDB::Document.new(@database, document.to_hash)
+      else
+        raise "Cannot convert #{document.inspect}"
+      end
+    end
+  end
+  
+  # commit an array of documents to the server
+  def commit_documents! documents
+    response = @database.http('_bulk_docs').post(JSON.generate(docs: documents.to_a))
+    raise response.body unless (200..299).include? response.code
+    json = JSON.parse(response.body)
+    errors = []
+    
+    documents.each_index do |index|
+      self[index]['id'] = json[index]['id']
+      self[index]['value']['rev'] = json[index]['rev'] if json[index]['rev']
+      errors.push [self[index], json[index]] if json[index]['error']
+    end
+    
+    raise errors unless errors.empty?
+    return self
+  end
+  
 end
 
 
@@ -434,6 +530,25 @@ class ChillDB::Design
   end
 end
 
+
+
+
+
+class ChillDB::BulkUpdateErrors < StandardError
+  attr_accessor :failures
+  
+  def initialize *args
+    @failures = args.pop
+    super(*args)
+  end
+  
+  def inspect
+    "ChillDB::BulkUpdateError:\n" + @failures.map { |failure|
+      document, error = failure
+      "  '#{document['_id']}': #{error['reason']}"
+    }.join('\n')
+  end
+end
 
 
 

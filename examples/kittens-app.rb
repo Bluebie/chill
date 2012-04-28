@@ -17,14 +17,6 @@ KittensApp.templates(
   }
 )
 
-# get a copy of a template, change some things, and save it
-KittensApp.template(:cat).merge(
-  color: 'green',
-  softness: 8,
-  dislikes: %w{stylesheets},
-  _id: 'fredrick'
-)
-
 # add a view
 KittensApp.design(:lists).views(
   soft_cats: 'function(doc) {
