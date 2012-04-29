@@ -7,13 +7,13 @@ require 'uri'
 # The main ChillDB module - This is where it all starts
 #
 # Throughout these docs you'll find classes under ChillDB. In a real
-# application you'll call ChillDB.goes :SomethingOrOther and from then on,
-# substitute ChillDB for SomethingOrOther when refering to class names.
-# ChillDB effectively creates a copy of itself linked to a database called
-# SomethingOrOther on the local couchdb server. Check out ChillDB.goes for
-# more details on getting started. Throughout the documentation, you'll see
-# KittensApp as a placeholder - imagine ChillDB.goes :KittensApp has been run
-# beforehand.
+# application you'll call <tt>ChillDB.goes :SomethingOrOther</tt> and from
+# then on, substitute <tt>ChillDB</tt> for <tt>SomethingOrOther</tt> when
+# refering to class names. ChillDB effectively creates a copy of itself linked
+# to a database called SomethingOrOther on the local couchdb server. Check out
+# ChillDB.goes for more details on getting started. Throughout the
+# documentation, you'll see KittensApp as a placeholder - imagine
+# <tt>ChillDB.goes :KittensApp</tt> has been run beforehand.
 module ChillDB
   # Creates a copy of ChillDB linked to a database named with the first
   # argument. You can also provide host, port, user, and pass options as a
@@ -25,8 +25,9 @@ module ChillDB
   # Example:
   #   ChillDB.goes :KittensApp
   #   
-  #   KittensApp['frederick'] # load 'frederick' from the KittensApp database on the locally installed couch server
-  #   => <ChillDB::Document>
+  #   # load 'frederick' from the KittensApp database
+  #   # on the locally installed couch server
+  #   KittensApp['frederick'] #=> <ChillDB::Document>
   def self.goes database_name, *args
     submod = Module.new do
       extend ChillDB
@@ -76,16 +77,18 @@ module ChillDB
     ChillDB::Document.new(@@database, properties)
   end
   
-  # Gets a ChillDB::Design document - if the design already exists, loads it.
-  # Creates a brand new design with this name otherwise, which can be extended
-  # with views and sent to the server to index your documents.
+  # Loads or creates a new ChillDB::Design with a specified name. Designs are
+  # used to create views, which create cached high speed document indexes for
+  # searching, sorting, and calculating.
   def design name
     ChillDB::Design.new @@database, name
   end
 
-  # Get or make a document with a particular id/name, or just a blank new one
-  # gets a document with a specific _id, or makes a blank one if it doesn't
-  # yet exist. Returns a ChillDB::Document
+  # Loads or creates a document with a specified _id. If no _id is specified
+  # a new blank document is created which will be assigned a fresh UUID as
+  # it's _id when saved unless you specify one before committing it.
+  #
+  # Returns a ChillDB::Document
   def document id = false
     if id.respond_to? :to_ary
       list = id.to_ary.map { |i| i.to_s }
@@ -102,8 +105,10 @@ module ChillDB
   # Commit a ChillDB::Document or a Hash to the database with a specific _id.
   # This method is useful for quickly storing bits of information. For more
   # involved applications, using ChillDB::Document objects directly is
-  # recomended. Returns a copy of the data as a ChillDB::Document, with _rev
-  # set to it's new value on the server.
+  # best.
+  #
+  # Returns a copy of the data as a ChillDB::Document, with _rev set to it's
+  # new value on the server.
   #
   # Example:
   #   KittensApp['bigglesworth'] = {kind: 'cat', softness: 11}
@@ -115,12 +120,11 @@ module ChillDB
     return ChillDB::Document.new(@@database, hash).commit!
   end
   
-  # Commit an array of ChillDB::Documents and Hashes to the server as new or
-  # updated documents. This collection can include ChillDB::Documents marked
+  # Commit an array of ChillDB::Documents and/or Hashes to the server as new or
+  # updated documents. This collection can include ChillDB::Document's marked
   # for deletion, and is the best way to update several documents at the same
-  # time. If an error occurs in a bulk commit, nonerronious documents will
-  # still be updated, and a ChillDB::BulkUpdateErrors is raised at the end
-  # indicating one or more documents failed, and their specific errors.
+  # time. All documents which can be committed will be, and any which cause
+  # errors will be reported via a raised ChillDB::BulkUpdateErrors.
   def commit! *documents
     list(documents.flatten).commit!
   end
@@ -128,7 +132,7 @@ module ChillDB
   # A shortcut for #commit! which marks the documents for deletion before
   # applying the commit, effectively bulk deleting them. If any deletions fail
   # a ChillDB::BulkUpdateErrors will be raised with info. All deletions which
-  # can succeed, will do.
+  # can succeed, will.
   def delete! *documents
     list(documents.flatten).delete!
   end
@@ -147,19 +151,27 @@ module ChillDB
   # This method is mainly useful for maintenence and mockups. Using
   # #everything in production apps is strongly discouraged, as it has severe
   # scalability implications - use a ChillDB::Design view instead if you can.
+  # 
+  # Example:
+  #   # The worst way to look up a document. Never ever do this.
+  #   all_of_them = KittensApp.everything # download all documents from server
+  #   fredrick = all_of_them['fredrick'] # locally find just the one you want
+  #   # Now ruby's garbage collector can happily remove every document you
+  #   # ever made from memory. Yay!
   def everything
     list = ChillDB::List.load(JSON.parse(@@database.http('_all_docs?include_docs=true').get.body))
     list.database = @@database
     return list
   end
   
-  # Returns the ChillDB::Database being used internally for this app.
+  # Returns this app's ChillDB::Database instance
   def database
     @@database
   end
   
   # Gets a reference to a resource on the database server, useful mainly
-  # internally. You shouldn't need to use this method.
+  # internally. You shouldn't need to use this method unless using Couch
+  # features chill doesn't yet have an interface for.
   def open *args
     headers = { accept: '*/*' }
     headers.merge! args.pop if args.last.respond_to? :to_hash
@@ -168,11 +180,12 @@ module ChillDB
 end
 
 
-# Database abstraction which does internal heavy lifting. You can access this
-# via KittensApp.database (following the ChillDB.goes :KittensApp convention)
+# A Database abstraction full of internal gizmos and a few external ones too.
+# You can access your Database via <tt>KittensApp.database</tt> (following the
+# <tt>ChillDB.goes :KittensApp</tt> convention)
 #
 # The database object is mainly useful for maintenance. The #info method is
-# neat for looking up stats on how the database is doing, and you ca ask for
+# neat for looking up stats on how the database is doing, and you can ask for
 # a compaction, to remove old revisions and make database files smaller.
 #
 # ChillDB::Database is mainly used internally and isn't very useful for most
@@ -200,10 +213,10 @@ class ChillDB::Database
   # still keep using your app while a compact is running, and it shouldn't
   # affect performance much. When using CouchDB, compacting is important as
   # Couch databases don't remove any old deleted or updated documents until
-  # #compact! is used. This may seem a bit odd, but it is part of how couch
+  # #compact! is called. This may seem a bit odd, but it is part of how couch
   # can be so reliable and difficult to corrupt during power failures and
-  # extended server outages. Don't worry about it too much! Once a week is
-  # plenty for most uses.
+  # extended server outages. Don't worry about unless your database files are
+  # getting too big.
   #
   # You can check to see if your couch server is currently compacting with
   # the #info method
@@ -214,7 +227,7 @@ class ChillDB::Database
   end
   
   # Gets a Hash of database configuration and status info from the server
-  # as an ChillDB::IndifferentHash. This contains all sorts of interesting
+  # as a ChillDB::IndifferentHash. This contains all sorts of interesting
   # information useful for maintenance.
   def info
     response = http('').get()
@@ -222,7 +235,7 @@ class ChillDB::Database
   end
   
   # pretty output for debugging things :)
-  def inspect # :nodoc:
+  def inspect
     "#<ChillDB::Database: #{info.inspect} >"
   end
   

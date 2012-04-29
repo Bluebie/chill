@@ -37,6 +37,8 @@ FindApp.template(:story).merge(
 She ran inside, throwing her big wooly coat away rushing to her computer. Dit dit dit! Each letter suspensfully appeared on her screen. "Wake up neo...". "Blargh" she announced. "This looser keeps bugging me, and I don't even know who this Neo guy is!"
 
 After carefully typing in a sentence so masterfully cutting it best not be repeated, she sighed and flopped back on her fluffy bed with a squeak.
+
+...
   )
 ).commit!
 
@@ -70,15 +72,47 @@ def highlight text
 end
 
 
-# find a story with the word 'it' in it, or a word you specify when calling the program
-word = ARGV.first || 'it'
-puts "Ran a search for '#{word}':"
-it_stories = FindApp.design(:search).query(:words, key: word.downcase, include_docs: true)
-it_stories.docs.uniq.each do |story|
-  puts "~~~ #{story['name'].upcase} ~~~"
+# find a story with the word 'it' in it, or a word you specify when calling
+# the program
+if ARGV.empty?
+  print "Search: "
+  words = gets.split(/[^a-z0-9']+/i)
+  raise "No words entered" if words.empty?
+else
+  words = ARGV
+end
+
+puts "Searching for #{ words.map { |w| highlight(w.capitalize) }.join ' ' }:\n\n"
+
+stories = []
+
+# lookup each word and add the stories to our collection
+first_word = true
+words.each do |word|
+  # you could make this faster by doing a single request using 'keys' instead
+  # of looping through each word doing a bunch of queries.
+  found = FindApp.design(:search).query(:words, key: word.downcase, include_docs: true)
+  
+  if first_word
+    stories += found.docs # add all the stories we found
+  else
+    stories &= found.docs # remove stories which don't also have this word!
+  end
+  
+  first_word = false # done being the first word now.
+end
+
+stories.uniq.each do |story|
+  puts "{ #{story.name.upcase} }".center(`tput cols`.to_i, '~')
+  
+  text = story.text
+  # create a regexp which finds any of the words we're after
+  searcher = Regexp.new("\\b(#{words.map { |word| Regexp.escape(word)}.join('|')})\\b", 'i')
+  text.gsub!(searcher) { |found| highlight(found) } # underline all the search words
   
   # underline all the search words
-  puts story['text'].gsub(Regexp.new("\\b#{Regexp.escape(word)}\\b", 'ig')) { |found| highlight(found) }
+  puts text
   puts "\n\n" # blank lines
 end
 
+puts "[ SEARCH FINISHED ]".center(`tput cols`.to_i, '=')
