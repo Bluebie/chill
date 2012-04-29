@@ -4,7 +4,29 @@ require 'uuid'
 require 'rest-client'
 require 'uri'
 
+# The main ChillDB module - This is where it all starts
+#
+# Throughout these docs you'll find classes under ChillDB. In a real
+# application you'll call ChillDB.goes :SomethingOrOther and from then on,
+# substitute ChillDB for SomethingOrOther when refering to class names.
+# ChillDB effectively creates a copy of itself linked to a database called
+# SomethingOrOther on the local couchdb server. Check out ChillDB.goes for
+# more details on getting started. Throughout the documentation, you'll see
+# KittensApp as a placeholder - imagine ChillDB.goes :KittensApp has been run
+# beforehand.
 module ChillDB
+  # Creates a copy of ChillDB linked to a database named with the first
+  # argument. You can also provide host, port, user, and pass options as a
+  # hash to connect chill to a remote couchdb server or just provide
+  # authentication info. Once ChillDB.goes has been called, you'll use the
+  # database_name instead of ChillDB when refering to chill's classes
+  # throughout your app.
+  #
+  # Example:
+  #   ChillDB.goes :KittensApp
+  #   
+  #   KittensApp['frederick'] # load 'frederick' from the KittensApp database on the locally installed couch server
+  #   => <ChillDB::Document>
   def self.goes database_name, *args
     submod = Module.new do
       extend ChillDB
@@ -17,25 +39,53 @@ module ChillDB
     Object.const_set(database_name, submod)
   end
   
-  # stores a list of templates which can be used to make a new document
+  # #templates stores a collection of new document templates. This is a handy
+  # shortcut to hold your different types of documents. Templates
+  # automatically have a property called 'kind' which is assigned to the
+  # template's name, which can be handy when writing views. They also provide
+  # a great place to write in default values, and are just generally handy as
+  # a place to keep a little note to yourself what fields you might expect in
+  # a type of document.
+  #
+  # Example:
+  #   KittensApp.templates(
+  #     cat: {
+  #       color: 'unknown',
+  #       softness: 5,
+  #       likes: ['exploding', 'cupcakes'],
+  #       dislikes: ['dark matter']
+  #     }
+  #   )
+  #   
+  #   # use the template, extend it with specific info, and save it!
+  #   new_cat = KittensApp.template(:cat).merge(
+  #     color: 'octarine',
+  #     softness: 13,
+  #     _id: 'bjorn'
+  #   ).commit!
   def templates obj
     @@templates.merge!(obj) if obj and obj.is_a? Hash
     return @@templates
   end
 
-  # get a new document consisting of a template
+  # Gets a copy of a template previously defined using #templates. further
+  # info on usage is in the description of #templates.
   def template kind
-    properties = @@templates[kind].dup
+    properties = @@templates[kind.to_sym].dup
     properties[:kind] = kind.to_s
     ChillDB::Document.new(@@database, properties)
   end
   
-  # get a design with a particular name - or make one!
+  # Gets a ChillDB::Design document - if the design already exists, loads it.
+  # Creates a brand new design with this name otherwise, which can be extended
+  # with views and sent to the server to index your documents.
   def design name
     ChillDB::Design.new @@database, name
   end
 
-  # get or make a document with a particular id/name, or just a blank new one
+  # Get or make a document with a particular id/name, or just a blank new one
+  # gets a document with a specific _id, or makes a blank one if it doesn't
+  # yet exist. Returns a ChillDB::Document
   def document id = false
     if id.respond_to? :to_ary
       list = id.to_ary.map { |i| i.to_s }
@@ -49,6 +99,14 @@ module ChillDB
   end
   alias_method :[], :document
   
+  # Commit a ChillDB::Document or a Hash to the database with a specific _id.
+  # This method is useful for quickly storing bits of information. For more
+  # involved applications, using ChillDB::Document objects directly is
+  # recomended. Returns a copy of the data as a ChillDB::Document, with _rev
+  # set to it's new value on the server.
+  #
+  # Example:
+  #   KittensApp['bigglesworth'] = {kind: 'cat', softness: 11}
   def []= document, hash
     raise "Not a hash?" unless hash.is_a? Hash
     hash = hash.dup
@@ -57,31 +115,51 @@ module ChillDB
     return ChillDB::Document.new(@@database, hash).commit!
   end
   
-  # commit takes an array of documents, and does a bulk commit to the server (one single request)
-  # using a bulk commit is faster than calling commit! on each individual document object
-  def commit! *args
-    list(args.flatten).commit!
+  # Commit an array of ChillDB::Documents and Hashes to the server as new or
+  # updated documents. This collection can include ChillDB::Documents marked
+  # for deletion, and is the best way to update several documents at the same
+  # time. If an error occurs in a bulk commit, nonerronious documents will
+  # still be updated, and a ChillDB::BulkUpdateErrors is raised at the end
+  # indicating one or more documents failed, and their specific errors.
+  def commit! *documents
+    list(documents.flatten).commit!
   end
   
-  def delete! *args
-    list(args.flatten).delete!
+  # A shortcut for #commit! which marks the documents for deletion before
+  # applying the commit, effectively bulk deleting them. If any deletions fail
+  # a ChillDB::BulkUpdateErrors will be raised with info. All deletions which
+  # can succeed, will do.
+  def delete! *documents
+    list(documents.flatten).delete!
   end
   
-  # turn an array of documents in to a ChillDB::List
+  # creates a new ChillDB::List from an array of ChillDB::Documents and
+  # hashes. This method is mainly used internally for #commit! and #delete!
+  # You shouldn't need to use this method.
   def list array = []
     list = ChillDB::List.from_array array
     list.database = @@database
     return list
   end
   
-  # all docs!
+  # Queries the server for every document. Returns a ChillDB::List.
+  #
+  # This method is mainly useful for maintenence and mockups. Using
+  # #everything in production apps is strongly discouraged, as it has severe
+  # scalability implications - use a ChillDB::Design view instead if you can.
   def everything
     list = ChillDB::List.load(JSON.parse(@@database.http('_all_docs?include_docs=true').get.body))
     list.database = @@database
     return list
   end
   
-  # open a resource to the server for a particular document, which you can get, post, etc to. For internal use.
+  # Returns the ChillDB::Database being used internally for this app.
+  def database
+    @@database
+  end
+  
+  # Gets a reference to a resource on the database server, useful mainly
+  # internally. You shouldn't need to use this method.
   def open *args
     headers = { accept: '*/*' }
     headers.merge! args.pop if args.last.respond_to? :to_hash
@@ -89,9 +167,22 @@ module ChillDB
   end
 end
 
+
+# Database abstraction which does internal heavy lifting. You can access this
+# via KittensApp.database (following the ChillDB.goes :KittensApp convention)
+#
+# The database object is mainly useful for maintenance. The #info method is
+# neat for looking up stats on how the database is doing, and you ca ask for
+# a compaction, to remove old revisions and make database files smaller.
+#
+# ChillDB::Database is mainly used internally and isn't very useful for most
+# chill apps.
 class ChillDB::Database
   attr_reader :url, :meta
-  def initialize name, settings = {}
+  
+  # Initialize a new database reference. This is used internally by
+  # ChillDB.goes, and shouldn't be used directly
+  def initialize name, settings = {} # :nodoc:
     @meta = {} # little place to store our things
     @url = URI::HTTP.build(
       host: settings[:host] || 'localhost',
@@ -104,29 +195,42 @@ class ChillDB::Database
     $stderr.puts "New database created at #{@url}" if http('').put('').code == 201
   end
   
-  # ask the server to compact this database
+  # Ask the CouchDB server to compact this database, effectively making a copy
+  # and moving all recent revisions and data across to the new file. You can
+  # still keep using your app while a compact is running, and it shouldn't
+  # affect performance much. When using CouchDB, compacting is important as
+  # Couch databases don't remove any old deleted or updated documents until
+  # #compact! is used. This may seem a bit odd, but it is part of how couch
+  # can be so reliable and difficult to corrupt during power failures and
+  # extended server outages. Don't worry about it too much! Once a week is
+  # plenty for most uses.
+  #
+  # You can check to see if your couch server is currently compacting with
+  # the #info method
   def compact!
     request = http('_compact').post('')
     raise request.body unless request.code == 202
     return self
   end
   
-  # get info about database
+  # Gets a Hash of database configuration and status info from the server
+  # as an ChillDB::IndifferentHash. This contains all sorts of interesting
+  # information useful for maintenance.
   def info
     response = http('').get()
     IndifferentHash.new.replace(JSON.parse response.body)
   end
   
   # pretty output for debugging things :)
-  def inspect
+  def inspect # :nodoc:
     "#<ChillDB::Database: #{info.inspect} >"
   end
   
   #def revs_limit; http('_revs_limit').get.body.to_i; end
   #def revs_limit=(v); http('_revs_limit').put(v.to_s); end
   
-  # grab a RestClient http resource for this database
-  def http resource, headers = {}
+  # grab a RestClient http resource for this database - useful internally
+  def http resource, headers = {} # :nodoc:
     RestClient::Resource.new((@url + resource).to_s, headers: {accept: 'application/json', content_type: 'application/json'}.merge(headers)) { |r| r }
   end
   
@@ -145,10 +249,11 @@ end
 
 
 
-
-# handles conversion of symbol keys to strings, and method accessors
+# A simple version of Hash which converts keys to strings - so symbols and
+# strings can be used interchangably as keys. Works pretty much like a Hash.
+# and also provides method getters and setters via #method_missing
 class ChillDB::IndifferentHash < Hash
-  def initialize *args
+  def initialize *args # :nodoc:
     super(*args) do |hash, key| # indifferent access
       hash[key.to_s] if Symbol === key
     end
@@ -163,25 +268,25 @@ class ChillDB::IndifferentHash < Hash
   
   # make hash thing indifferent
   [:merge, :merge!, :replace, :update, :update!].each do |name|
-    define_method name do |*args,&proc|
+    define_method name do |*args,&proc| # :nodoc:
       super(normalize_hash(args.shift), *args, &proc)
     end
   end
   
   # make hash thing indifferent
   [:has_key?, :include?, :key?, :member?, :delete].each do |name|
-    define_method name do |first, *seconds,&proc|
+    define_method name do |first, *seconds,&proc| # :nodoc:
       first = first.to_s if first.is_a? Symbol
       super(first, *seconds, &proc)
     end
   end
   
-  def []= key, value
+  def []= key, value # :nodoc:
     key = key.to_s if key.is_a? Symbol
     super(key, normalize(value))
   end
   
-  # return an actual hash
+  # Convert to a regular ruby Hash
   def to_hash
     Hash.new.replace self
   end
@@ -212,11 +317,15 @@ end
 
 
 
-
+# ChillDB Document, normally created from a template via ChillDB.template or
+# from scratch via ChillDB.document or with a specific _id value via
+# ChillDB['document-id'] or ChillDB.document('document-id'). Document
+# represents a document in your database. It works as a hash with indifferent
+# access and method accessors (see also ChillDB::IndifferentHash)
 class ChillDB::Document < ChillDB::IndifferentHash
   attr_reader :database
   
-  def initialize database, values = false
+  def initialize database, values = false # :nodoc:
     @database = database
     super()
     
@@ -227,17 +336,30 @@ class ChillDB::Document < ChillDB::IndifferentHash
     end
   end
   
+  # replace all values in this document with new ones, effectively making it
+  # a new document
+  #
+  # Arguments:
+  #   values: A hash of values
   def reset values
-    self.replace values
+    raise "Argument must be a Hash" unless values.respond_to? :to_hash
+    self.replace values.to_hash
     self['_id'] ||= UUID.new.generate # generate an _id if we don't have one already
   end
   
-  def self.load database, docid
+  # load a documet from a ChillDB::Database, with a specific document id, and
+  # optionally a specific revision.
+  #
+  # Returns:
+  #   New instance of Document
+  def self.load database, docid, revision = nil
     new(database, _id: docid).load
   end
   
-  # load this document from server in to this local cache
-  # returns self, or if there's a more specific subclass, a subclassed version of Document
+  # load the current document again from the server, fetching any updates or
+  # a specific revision.
+  #
+  # Returns: self
   def load lookup_revision = nil
     url = URI(URI.escape self['_id'])
     lookup_revision ||= self['_rev']
@@ -250,7 +372,11 @@ class ChillDB::Document < ChillDB::IndifferentHash
     return self
   end
   
-  # stores updates (or newly existingness) of document to origin database
+  # Write any changes to the database. If this is a new document, one will be
+  # created on the Couch server. If this document has a specific _id value it
+  # will be created or updated.
+  #
+  # Returns: self
   def commit!
     return delete! if self['_deleted'] # just delete if we're marked for deletion
     json = JSON.generate(self)
@@ -263,12 +389,15 @@ class ChillDB::Document < ChillDB::IndifferentHash
     return self
   end
   
-  # mark this jerk for deletion! (useful for bulk commit)
+  # Mark this document for deletion. A commit! is required to delete the
+  # document from the server. You can mark several documents for deletion and
+  # supply them to ChillDB.commit! for bulk deletion.
   def delete
     self.replace('_id'=> self['_id'], '_rev'=> self['_rev'], '_deleted'=> true)
   end
   
-  # delete this jerk immediately
+  # Shortcut for document.delete.commit! - deletes document from server
+  # immediately, returning the server's response as a Hash.
   def delete!
     response = @database.http(URI.escape self['_id']).delete()
     response = ChillDB::IndifferentHash.new.replace JSON.parse(response.body)
@@ -277,26 +406,60 @@ class ChillDB::Document < ChillDB::IndifferentHash
     return response
   end
   
-  # set current revision to a different thing
+  # set the current document revision, reloading document content from the
+  # couch server.
+  #
+  # Arguments:
+  #   new_revision: (String)
   def revision= new_revision
     load new_revision
   end
   
-  # gets a list of revisions
+  # get's the current document revision identifier string
+  #
+  # Returns: (String) revision identifier
+  def revision
+    self['_rev']
+  end
+  
+  # fetch an array of this document's available revisions from the server
+  #
+  # Returns: array of revision identifier strings
   def revisions
     request = @database.http("#{URI.escape self['_id']}?revs=true").get
     json = JSON.parse(request.body)
     json['_revisions']['ids']
   end
   
-  # for integration with url routers in webapps, to_param defaults to _id - which you can use straight up in urls
+  # to_param is supplied for integration with url routers in web frameworks
+  # like Rails and Camping. Defaults to returning the document's _id. You can
+  # just pass documents in to functions which generate urls in your views in
+  # many ruby frameworks, and it will be understood as the _id of the document
+  #
+  # If you have a more intelligent behaviour, monkeypatch in some special
+  # behaviour.
+  #
+  # Returns:
+  #   (String): self['_id']
   def to_param
     self['_id']
   end
   
-  # loose equality check
+  # A loose equality check. Two documents are considered equal if their _id
+  # and _rev are equal, and they are both of the same class. This is handy
+  # when dealing with Array's and ChillDB::List's. For instance, you may want
+  # to query one view, then remove the values found in another view
+  #
+  # Example:
+  #
+  #   kittens = KittensApp.design(:lists).query(:cats)
+  #   kittens -= KittensApp.design(:lists).query(:adults)
+  #   # kittens now contains cats who are not adults
+  #
+  # Of course if you're doing this sort of thing often, you really should
+  # consider precomputing it in a view.
   def == other_doc
-    other.is_a?(self.class) and (self['_id'] == other['_id']) and (self['_rev'] == other['_rev'])
+    (other.class == self.class) and (self['_id'] == other['_id']) and (self['_rev'] == other['_rev'])
   end
 end
 
@@ -304,12 +467,20 @@ end
 
 
 
-
+# A special sort of Array designed for storing lists of documents, and
+# particularly the results of ChillDB::Design#query. It works sort of like a
+# hash, in supporting lookups by key, and sort of like an array, in its sorted
+# nature. It keeps the association of keys, documents, values, id's, and also
+# provides a simple way to bulk commit all the documents in the list or delete
+# all of them form the server in one efficient request.
+#
+# The recomended way to create a list from a regular array is ChillDB.list()
+# as some of List's functionality depends on it having a link to the database.
 class ChillDB::List < Array
   attr_accessor :total_rows, :offset, :database
   
   # creates a new List from a couchdb response
-  def self.load list, extras = {}
+  def self.load list, extras = {} # :nodoc:
     new_list = self.new
     
     raise "#{list['error']} - #{list['reason']}" if list['error']
@@ -323,7 +494,7 @@ class ChillDB::List < Array
   end
   
   # to make a list from a simple array (not a couchdb response...)
-  def self.from_array array
+  def self.from_array array # :nodoc:
     new_list = self.new
     new_list.replace array.map do |item|
       { 'id'=> item['_id'], 'key'=> item['_id'], 'value'=> item, 'doc'=> item }
@@ -331,7 +502,7 @@ class ChillDB::List < Array
   end
   
   # store rows nicely in mah belleh
-  def rows=(arr)
+  def rows=(arr) # :nodoc:
     self.replace(arr.map { |item|
       if item['value'].is_a? Hash
         if item['value'].respond_to?(:[]) && item['value']['_id']
@@ -348,47 +519,81 @@ class ChillDB::List < Array
     })
   end
   
-  # we are the rows!
+  # Grab all the rows - actually just self.
   def rows
     self
   end
   
+  # Returns an Array of all the document _id strings in the list
   def ids
     self.map { |i| i['id'] }
   end
   
+  # Returns an Array of keys in the list
   def keys
     self.map { |i| i['key'] }
   end
   
+  # Returns an Array of all the emitted values in the list
   def values
     self.map { |i| i['value'] }
   end
   
+  # Returns an Array of all the documents in this list.
+  #
+  # Note that querying a view with ChillDB::Design#query does not include
+  # documents by default. Calling ChillDB::Design#query with the include_docs
+  # option set to true causes the database to lookup all of the documents.
   def docs
     self.map { |i| i['doc']  }
   end
   
+  # Iterates each key/value pair using a supplied proc.
+  #
+  # Example: 
+  #
+  #   list.each_pair do |key, value|
+  #     puts "#{key}: #{value.inspect}"
+  #   end
+  #
+  # :yeild: key, value
   def each_pair &proc
     self.each { |item| proc.call(item['key'], item['value']) }
   end
   
-  # gets an item by id value
+  # fetch a document by it's id from this list. Useful only for queries with
+  # <pp>{ include_docs: true }</pp> set
   def id value
     self.find { |i| i['id'] == value }['doc']
   end
   
+  # Lookup a key from the list. Returns a ChillDB::IndifferentHash containing:
+  #
+  #   {
+  #     'key'   => key from database
+  #     'value' => emitted value in view, if any
+  #     'doc'   => document, if view queried with { include_docs: true }
+  #     'id'    => id of document which emitted this result
+  #   }
   def key value
-    self.find { |i| i['key'] == value }
+    ChillDB::IndifferentHash.new.replace(self.find { |i| i['key'] == value })
   end
   
+  # Lookup a document, by a key in the list. If there are multiple entries
+  # in the view with this key, the first document is returned.
+  #
+  # Note this will return nil for lists returned by ChillDB::Design#query
+  # unless the query was done with the include_docs option set to true.
   def [] key
     return key(key)['doc'] unless key.respond_to? :to_int
     super
   end
   
   # make a regular ruby hash version
-  # if you want docs as values instead of emitted values, use to_h(:doc)
+  #
+  # By default returns a hash containing <tt>{ key: value }</tt> pairs from
+  # the list. Passing :doc as the optional argument instead creates a hash of
+  # <tt>{ key: doc }</tt> pairs.
   def to_h value = :value
     hash = ChillDB::IndifferentHash.new
     
@@ -399,14 +604,25 @@ class ChillDB::List < Array
     return hash
   end
   
-  # commit takes an array of documents, and does a bulk commit to the server (one single request)
-  # using a bulk commit is faster than calling commit! on each individual document object
+  # Commit every document in this list to the server in a single quick
+  # request. Every document which can be committed will be, and if any fail
+  # a ChillDB::BulkUpdateErrors will be raised.
+  #
+  # Returns self. 
   def commit!
     commit_documents! convert
   end
   alias_method :commit_all!, :commit!
   
-  # remove all the documents in this list from the database
+  # Delete every document in this list from the server. If this list was
+  # returned by ChillDB::Design#query, your view's values will need to be a
+  # Hash containing <tt>rev</tt> or <tt>_rev</tt> - indicating the document's
+  # revision. You can also query your view with <tt>{ include_docs: true }</tt>
+  # specified as an option. Deletion cannot happen without a revision
+  # identifier. All documents which can be deleted, will be. If there are any
+  # errors, they'll be raised as a ChillDB::BulkUpdateErrors.
+  #
+  # Returns self.
   def delete!
     # check all the entries have a _rev - if they don't they cannot be deleted!
     each do |item|
@@ -460,9 +676,29 @@ end
 
 
 
-
+# Representing a named design in the Couch database, Design is used to setup
+# views. Views index all of the documents in your database, creating
+# ChillDB::List's for each emitted document. Your views can choose to emit
+# as many entries as you like for each document, or none at all. Views can be
+# as simple as listing all of a certain kind of document, or more complex
+# schemes like extracting every word in a document and generating an index of
+# words in documents for a simple but powerful search engine.
+#
+# For more information on designs and views, CouchDB: The Definitive Guide is
+# a great resource. http://guide.couchdb.org/draft/design.html
+#
+# Example:
+#   KittensApp.design(:lists).views(
+#     # lists all cats with a softness rating of two or more
+#     soft_cats: 'function(doc) {
+#       if (doc.kind == "cat" && doc.softness > 1) emit(doc._id, null);
+#     }'
+#   ).commit!
+# 
+# Note that views default to being javascript functions, as this is what couch
+# ships with support for. It is possible to 
 class ChillDB::Design
-  attr_accessor :name # can rename with that - though leaves old copy on server probably
+  attr_accessor :name
   
   def initialize database, name
     @database = database
@@ -477,26 +713,107 @@ class ChillDB::Design
     return @document
   end
   
-  # adds views
+  # Add more views to an existing design. See also #views
   def add_views collection
     document['views'].merge! views_preprocess(collection)
     return self
   end
   
-  # sets views
+  # Set the views in this design. Argument is a Hash containing String's for
+  # each javascript (by default) view function. Reduce functions can also be
+  # included optionally.
+  # 
+  # Example:
+  #   KittensApp.design(:lists).views(
+  #     # just a map function
+  #     adults: 'function(doc) {
+  #       if (doc.kind == "cat" && doc.age > 4) emit(doc._id, null);
+  #     }',
+  #   
+  #     # a map and a reduce - lookup the overall softness of our kitten database
+  #     # when queried returns just one value: the number output of the reduce
+  #     # function.
+  #     softness: {
+  #       map: 'function(doc) {
+  #         if (doc.kind == "cat") emit(doc._id, doc.softness);
+  #       }',
+  #       reduce: 'function(key, values, rereduce) {
+  #         return sum(values); // add them all together
+  #       }'
+  #     }
+  #   ).commit!
+  # 
+  #   KittensApp.design(:lists).query(:adults) #=> <ChillDB::List> [a, b, c...]
+  #   KittensApp.design(:lists).query(:softness) #=> 19
+  #
+  # Check out http://wiki.apache.org/couchdb/Introduction_to_CouchDB_views for
+  # a great introduction to CouchDB view design.
   def views collection
     document['views'] = {}
     add_views collection
     return self
   end
   
-  # store changes to server
+  # get's the current language of this design document. Usually this would be
+  # "javascript". If called with an argument, set's the language property and
+  # returns self.
+  #
+  # Example:
+  #   KittensApp.design(:lists).language #=> "javascript"
+  #   KittensApp.design(:lists).language(:ruby) #=> KittensApp.design(:lists)
+  #   KittensApp.design(:lists).language #=> "ruby"
+  # 
+  #   # chain it together with views for extra nyan:
+  #   KittensApp.design(:lists).language(:ruby).views(
+  #     soft_cats: %q{ proc do |doc|
+  #       emit doc['_id'], doc['softness'] if doc['softness'] > 1 
+  #     end }
+  #   )
+  #
+  # ChillDB doesn't currently include a ruby view server, and it needs to be
+  # specifically configured and installed before you can use one. More info
+  # in an implementation is at http://theexciter.com/articles/couchdb-views-in-ruby-instead-of-javascript.html
+  def language set = nil
+    if set
+      @document['language'] = set.to_s
+      self
+    else
+      @document['language']
+    end
+  end
+  
+  # Commit this design document to the server and start the server's process
+  # of updating the view's contents. Note that querying the view immediately
+  # after a commit may be slow, while the server finishes initially processing
+  # it's contents. The more documents you have, the more time this can take.
   def commit!
     document['_id'] = "_design/#{@name}"
     document.commit!
   end
   
-  # query a view - response is an array augmented with methods like arr.total_rows
+  # Query a named view. Returns a ChillDB::List, which works like a Hash or an
+  # Array containing each result. Optionally pass in arguments. Check out
+  # http://wiki.apache.org/couchdb/HTTP_view_API#Querying_Options for the
+  # definitive list. Some really useful options:
+  #
+  # Options:
+  #   include_docs: (true or false) load documents which emitted each entry?
+  #   key: only return items emitted with this exact key
+  #   keys: (Array) only return items emitted with a key in this Array
+  #   range: (Range) shortcut for startkey, endkey, and inclusive_end
+  #   startkey: return items starting with this key
+  #   endkey: return items ending with this key
+  #   startkey_docid: (String) return items starting with this document id
+  #   endkey_docid: (String) return items ending with this document id
+  #   inclusive_end: (true or false) defaults true, endkey included in result?
+  #   limit: (Number) of documents to load before stopping
+  #   stale: (String) 'ok' or 'update_after' - view need not be up to date.
+  #   descending: (true or false) direction of search?
+  #   skip: (Number) skip the first few documents - slow - not recomended!
+  #   group: (true or false) should reduce grouping by exact identical key?
+  #   group_level: (Number) first x items in key Array are used to group rows
+  #   reduce: (true or false) should the reduce function be used?
+  #   update_seq: (true or false) response includes sequence id of database?
   def query view, options = {}
     if options[:range]
       range = options.delete[:range]
@@ -522,6 +839,7 @@ class ChillDB::Design
   
   private
   
+  # handles the little shortcut for specifying only a map function
   def views_preprocess views_hash
     views_hash.each do |key, value|
       views_hash[key] = { map: value } if value.respond_to? :to_str
@@ -533,19 +851,21 @@ end
 
 
 
-
+# Represents one or more failure when doing a bulk commit or delete.
 class ChillDB::BulkUpdateErrors < StandardError
+  # Array of failure messages
   attr_accessor :failures
   
-  def initialize *args
+  def initialize *args # :nodoc:
     @failures = args.pop
     super(*args)
   end
   
+  # friendly message listing the failures for each document
   def inspect
-    "ChillDB::BulkUpdateError:\n" + @failures.map { |failure|
+    "<ChillDB::BulkUpdateError>:\n" + @failures.map { |failure|
       document, error = failure
-      "  '#{document['_id']}': #{error['reason']}"
+      "  '#{document['_id']}' => #{error['reason']}"
     }.join('\n')
   end
 end
