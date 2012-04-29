@@ -1,7 +1,7 @@
 # Bluebie's silly little CouchDB abstraction
-require 'json'
-require 'uuid'
-require 'rest-client'
+require 'json' # gem dependancy
+require 'rest-client' # gem dependancy
+require 'securerandom'
 require 'uri'
 
 # The main ChillDB module - This is where it all starts
@@ -357,7 +357,7 @@ class ChillDB::Document < ChillDB::IndifferentHash
   def reset values
     raise "Argument must be a Hash" unless values.respond_to? :to_hash
     self.replace values.to_hash
-    self['_id'] ||= UUID.new.generate # generate an _id if we don't have one already
+    self['_id'] ||= SecureRandom.uuid # generate an _id if we don't have one already
   end
   
   # load a documet from a ChillDB::Database, with a specific document id, and
