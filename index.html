@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640" />
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
+    <title>ChillDB by Bluebie</title>
+  </head>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/Bluebie/chill">Fork Me on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>ChillDB</h1>
+            <h2>chill plugs ruby in to couchdb</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/Bluebie/chill/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/Bluebie/chill/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+      <span class="banner-fix"></span>
+
+      <section id="main_content">
+        <h2>.oOo. .oOo. .oOo. chill .oOo. .oOo. .oOo.</h2>
+
+<p>chill plugs ruby code in to CouchDB</p>
+
+<h3>USAGE</h3>
+
+<div class="highlight">
+<pre><span class="nb">require</span> <span class="s1">'pp'</span>
+<span class="nb">require</span> <span class="s1">'chill'</span>
+
+<span class="c1"># make a database or connect to one</span>
+<span class="no">ChillDB</span><span class="o">.</span><span class="n">goes</span> <span class="ss">:KittensApp</span>
+
+<span class="c1"># add a template (just in ruby instance)</span>
+<span class="no">KittensApp</span><span class="o">.</span><span class="n">templates</span><span class="p">(</span>
+  <span class="n">cat</span><span class="p">:</span> <span class="p">{</span>
+    <span class="n">color</span><span class="p">:</span> <span class="s1">'invisible'</span><span class="p">,</span>
+    <span class="n">softness</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">likes</span><span class="p">:</span> <span class="sx">%w{water food flying spaceships sunlight tictacs hugs exploding}</span><span class="p">,</span>
+    <span class="n">dislikes</span><span class="p">:</span> <span class="sx">%w{mysql}</span>
+  <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># get a copy of a template, change some things, and save it</span>
+<span class="no">KittensApp</span><span class="o">.</span><span class="n">template</span><span class="p">(</span><span class="ss">:cat</span><span class="p">)</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+  <span class="n">color</span><span class="p">:</span> <span class="s1">'green'</span><span class="p">,</span>
+  <span class="n">softness</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+  <span class="n">dislikes</span><span class="p">:</span> <span class="sx">%w{stylesheets}</span><span class="p">,</span>
+  <span class="n">_id</span><span class="p">:</span> <span class="s1">'fredrick'</span>
+<span class="p">)</span>
+
+<span class="c1"># add a view</span>
+<span class="no">KittensApp</span><span class="o">.</span><span class="n">design</span><span class="p">(</span><span class="ss">:lists</span><span class="p">)</span><span class="o">.</span><span class="n">views</span><span class="p">(</span>
+  <span class="n">soft_cats</span><span class="p">:</span> <span class="s1">'function(doc) {</span>
+<span class="s1">    if (doc.kind == "cat" &amp;&amp; doc.softness &gt; 1) emit(doc._id, null);</span>
+<span class="s1">  }'</span>
+<span class="p">)</span><span class="o">.</span><span class="n">commit!</span>
+
+<span class="c1"># add a kitten</span>
+<span class="no">KittensApp</span><span class="o">.</span><span class="n">template</span><span class="p">(</span><span class="ss">:cat</span><span class="p">)</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">_id</span><span class="p">:</span> <span class="s1">'fredrick'</span><span class="p">,</span> <span class="n">softness</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="n">dislikes</span><span class="p">:</span> <span class="o">[</span><span class="s1">'silly business'</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">commit!</span>
+
+<span class="c1"># use the view to get a list of non-hard cats</span>
+<span class="n">soft_ones</span> <span class="o">=</span> <span class="no">KittensApp</span><span class="o">.</span><span class="n">design</span><span class="p">(</span><span class="ss">:lists</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="ss">:soft_cats</span><span class="p">)</span>
+<span class="n">soft_ones</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">cat</span><span class="o">|</span>
+  <span class="n">pp</span> <span class="n">cat</span>
+<span class="k">end</span>
+
+<span class="c1"># just load fredrick</span>
+<span class="n">fredrick</span> <span class="o">=</span> <span class="no">KittensApp</span><span class="o">[</span><span class="s1">'fredrick'</span><span class="o">]</span>
+</pre>
+</div>
+
+
+<h3>More Information Than You Require</h3>
+
+<p>You can see a more fully baked version of the KittensApp database in examples/kittens-app.rb. There you will see how to do all sorts of things. It's the start of a really great kitten database you could use to keep track of your cats. It's web scale and cloud ready.</p>
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/Bluebie">Bluebie</a> can be found on <a href="https://github.com/Bluebie/chill">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
