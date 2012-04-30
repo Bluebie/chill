@@ -1,0 +1,74 @@
+@import url("MyFontsWebfontsKit.css");
+
+body {
+  margin: 4em auto 6em auto;
+  width: 400px;
+  -webkit-text-size-adjust: none;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	border-bottom: 1px dotted #AAA;
+	-webkit-transition: border-color 0.1s linear;
+	-moz-transition: border-color 0.1s linear;
+	transition: border-color 0.1s linear;
+	display: inline-block;
+  height: 14px;
+  font-size: inherit;
+}
+
+a:hover {
+  border-bottom-style: solid;
+  border-bottom-color: blue;
+}
+
+ul { padding: 0; margin: 0 0 0.5em 0; }
+li { margin-left: 1.5em; }
+li h3 { margin: 0; padding: 0; font-family: inherit; font-size: inherit; font-weight: inherit; }
+
+header {
+  border-width: 0 0 1px 0;
+  -webkit-border-image: -webkit-linear-gradient(left, white, rgba(0,0,0,0.25), white);
+  text-align: center;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  font-family: WorstveldSling, Helvetica, Arial;
+  font-size: 55px;
+  margin: 0;
+}
+
+header h2 {
+  font-family: WorstveldSling, Helvetica, Arial;
+  font-size: 22px;
+  margin: 0;
+}
+
+@media only screen and (max-width: 500px) {
+  header h2 { font-size: 33px; }
+}
+
+.content {
+  padding: 0 0.5em;
+  text-align: justify;
+  font-family: Times, "Times New Roman", sans-serif;
+	font-size: 13px;
+	line-height: 1.3;
+}
+
+.content #summary {
+  text-transform: lowercase;
+}
+
+@media only screen and (max-width: 500px) {
+  .content { font-size: 17px; }
+  a { height: 20px; }
+}
+
+.content abbr {
+  font-variant: small-caps;
+  font-size: 110%;
+}
+

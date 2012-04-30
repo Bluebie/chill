@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>class ChillDB::Design - chill-8 Documentation</title>
+
+<link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../index.html">Home</a>
+    <a href="../table_of_contents.html#classes">Classes</a>
+    <a href="../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>library/chill.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-new">::new</a>
+    
+    <li><a href="#method-i-add_views">#add_views</a>
+    
+    <li><a href="#method-i-commit-21">#commit!</a>
+    
+    <li><a href="#method-i-document">#document</a>
+    
+    <li><a href="#method-i-language">#language</a>
+    
+    <li><a href="#method-i-query">#query</a>
+    
+    <li><a href="#method-i-views">#views</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../ChillDB.html">ChillDB</a>
+  
+    <li><a href="../ChillDB/BulkUpdateErrors.html">ChillDB::BulkUpdateErrors</a>
+  
+    <li><a href="../ChillDB/Database.html">ChillDB::Database</a>
+  
+    <li><a href="../ChillDB/Design.html">ChillDB::Design</a>
+  
+    <li><a href="../ChillDB/Document.html">ChillDB::Document</a>
+  
+    <li><a href="../ChillDB/IndifferentHash.html">ChillDB::IndifferentHash</a>
+  
+    <li><a href="../ChillDB/List.html">ChillDB::List</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class ChillDB::Design</h1>
+
+  <div id="description" class="description">
+    
+<p>Representing a named design in the Couch database, <a
+href="Design.html">Design</a> is used to setup views. Views index all of
+the documents in your database, creating ChillDB::List’s for each emitted
+document. Your views can choose to emit as many entries as you like for
+each document, or none at all. Views can be as simple as listing all of a
+certain kind of document, or more complex schemes like extracting every
+word in a document and generating an index of words in documents for a
+simple but powerful search engine.</p>
+
+<p>For more information on designs and views, CouchDB: The Definitive Guide is
+a great resource. <a
+href="http://guide.couchdb.org/draft/design.html">guide.couchdb.org/draft/design.html</a></p>
+
+<p>Example:</p>
+
+<pre>KittensApp.design(:lists).views(
+  # lists all cats with a softness rating of two or more
+  soft_cats: 'function(doc) {
+    if (doc.kind == &quot;cat&quot; &amp;&amp; doc.softness &gt; 1) emit(doc._id, null);
+  }'
+).commit!</pre>
+
+<p>Note that views default to being javascript functions, as this is what
+couch ships with support for. It is possible to</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+    <!-- Attributes -->
+    <section id="attribute-method-details" class="method-section section">
+      <h3 class="section-header">Attributes</h3>
+
+      
+      <div id="attribute-i-name" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">name</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section><!-- attribute-method-details -->
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">(database, name)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 716</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span> <span class="ruby-identifier">database</span>, <span class="ruby-identifier">name</span>
+  <span class="ruby-ivar">@database</span> = <span class="ruby-identifier">database</span>
+  <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-add_views" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">add_views</span><span
+            class="method-args">(collection)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Add more views to an existing design. See also <a
+href="Design.html#method-i-views">views</a></p>
+          
+
+          
+          <div class="method-source-code" id="add_views-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 730</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_views</span> <span class="ruby-identifier">collection</span>
+  <span class="ruby-identifier">document</span>[<span class="ruby-string">'views'</span>].<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">views_preprocess</span>(<span class="ruby-identifier">collection</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- add_views-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- add_views-method -->
+
+    
+      <div id="method-i-commit-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">commit!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Commit this design document to the server and start the server’s process of
+updating the view’s contents. Note that querying the view immediately after
+a commit may be slow, while the server finishes initially processing it’s
+contents. The more documents you have, the more time this can take.</p>
+          
+
+          
+          <div class="method-source-code" id="commit-21-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 802</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">commit!</span>
+  <span class="ruby-identifier">document</span>[<span class="ruby-string">'_id'</span>] = <span class="ruby-node">&quot;_design/#{@name}&quot;</span>
+  <span class="ruby-identifier">document</span>.<span class="ruby-identifier">commit!</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- commit-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- commit-21-method -->
+
+    
+      <div id="method-i-document" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">document</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>lazy load document - referencing this causes load from database</p>
+          
+
+          
+          <div class="method-source-code" id="document-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 722</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">document</span>
+  <span class="ruby-ivar">@document</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span><span class="ruby-operator">::</span><span class="ruby-identifier">load</span> <span class="ruby-ivar">@database</span>, <span class="ruby-node">&quot;_design/#{@name}&quot;</span>
+  <span class="ruby-ivar">@document</span>[<span class="ruby-string">'language'</span>] <span class="ruby-operator">||=</span> <span class="ruby-string">'javascript'</span>
+  <span class="ruby-ivar">@document</span>[<span class="ruby-string">'views'</span>] <span class="ruby-operator">||=</span> {}
+  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@document</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- document-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- document-method -->
+
+    
+      <div id="method-i-language" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">language</span><span
+            class="method-args">(set = nil)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>get’s the current language of this design document. Usually this would be
+“javascript”. If called with an argument, set’s the language property and
+returns self.</p>
+
+<p>Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">KittensApp</span>.<span class="ruby-identifier">design</span>(:<span class="ruby-identifier">lists</span>).<span class="ruby-identifier">language</span> <span class="ruby-comment">#=&gt; &quot;javascript&quot;</span>
+<span class="ruby-constant">KittensApp</span>.<span class="ruby-identifier">design</span>(:<span class="ruby-identifier">lists</span>).<span class="ruby-identifier">language</span>(:<span class="ruby-identifier">ruby</span>) <span class="ruby-comment">#=&gt; KittensApp.design(:lists)</span>
+<span class="ruby-constant">KittensApp</span>.<span class="ruby-identifier">design</span>(:<span class="ruby-identifier">lists</span>).<span class="ruby-identifier">language</span> <span class="ruby-comment">#=&gt; &quot;ruby&quot;</span>
+
+<span class="ruby-comment"># chain it together with views for extra nyan:</span>
+<span class="ruby-constant">KittensApp</span>.<span class="ruby-identifier">design</span>(:<span class="ruby-identifier">lists</span>).<span class="ruby-identifier">language</span>(:<span class="ruby-identifier">ruby</span>).<span class="ruby-identifier">views</span>(
+  <span class="ruby-identifier">soft_cats</span><span class="ruby-operator">:</span> <span class="ruby-string">%q{ proc do |doc|
+    emit doc['_id'], doc['softness'] if doc['softness'] &gt; 1 
+  end }</span>
+)
+</pre>
+
+<p><a href="../ChillDB.html">ChillDB</a> doesn't currently include a ruby view
+server, and it needs to be specifically configured and installed before you
+can use one. More info in an implementation is at <a
+href="http://theexciter.com/articles/couchdb-views-in-ruby-instead-of-javascript.html">theexciter.com/articles/couchdb-views-in-ruby-instead-of-javascript.html</a></p>
+          
+
+          
+          <div class="method-source-code" id="language-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 789</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">language</span> <span class="ruby-identifier">set</span> = <span class="ruby-keyword">nil</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">set</span>
+    <span class="ruby-ivar">@document</span>[<span class="ruby-string">'language'</span>] = <span class="ruby-identifier">set</span>.<span class="ruby-identifier">to_s</span>
+    <span class="ruby-keyword">self</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-ivar">@document</span>[<span class="ruby-string">'language'</span>]
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- language-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- language-method -->
+
+    
+      <div id="method-i-query" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">query</span><span
+            class="method-args">(view, options = {})</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Query a named view. Returns a <a href="List.html">ChillDB::List</a>, which
+works like a Hash or an Array containing each result. Optionally pass in
+arguments. Check out <a
+href="http://wiki.apache.org/couchdb/HTTP_view_API#Querying_Options">wiki.apache.org/couchdb/HTTP_view_API#Querying_Options</a>
+for the definitive list. Some really useful options:</p>
+
+<p>Options:</p>
+
+<pre>include_docs: (true or false) load documents which emitted each entry?
+key: only return items emitted with this exact key
+keys: (Array) only return items emitted with a key in this Array
+range: (Range) shortcut for startkey, endkey, and inclusive_end
+startkey: return items starting with this key
+endkey: return items ending with this key
+startkey_docid: (String) return items starting with this document id
+endkey_docid: (String) return items ending with this document id
+inclusive_end: (true or false) defaults true, endkey included in result?
+limit: (Number) of documents to load before stopping
+stale: (String) 'ok' or 'update_after' - view need not be up to date.
+descending: (true or false) direction of search?
+skip: (Number) skip the first few documents - slow - not recomended!
+group: (true or false) should reduce grouping by exact identical key?
+group_level: (Number) first x items in key Array are used to group rows
+reduce: (true or false) should the reduce function be used?
+update_seq: (true or false) response includes sequence id of database?</pre>
+          
+
+          
+          <div class="method-source-code" id="query-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 830</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">query</span> <span class="ruby-identifier">view</span>, <span class="ruby-identifier">options</span> = {}
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:range</span>]
+    <span class="ruby-identifier">range</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>[<span class="ruby-value">:range</span>]
+    <span class="ruby-identifier">options</span>[<span class="ruby-value">:startkey</span>], <span class="ruby-identifier">options</span>[<span class="ruby-value">:endkey</span>] = <span class="ruby-identifier">range</span>.<span class="ruby-identifier">first</span>, <span class="ruby-identifier">range</span>.<span class="ruby-identifier">last</span>
+    <span class="ruby-identifier">options</span>[<span class="ruby-value">:startkey</span>], <span class="ruby-identifier">options</span>[<span class="ruby-value">:endkey</span>] = <span class="ruby-identifier">options</span>[<span class="ruby-value">:endkey</span>], <span class="ruby-identifier">options</span>[<span class="ruby-value">:startkey</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:descending</span>]
+    <span class="ruby-identifier">options</span>[<span class="ruby-value">:inclusive_end</span>] = <span class="ruby-operator">!</span><span class="ruby-identifier">range</span>.<span class="ruby-identifier">exclude_end?</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-comment"># these options need to be json encoded</span>
+  [<span class="ruby-value">:key</span>, <span class="ruby-value">:startkey</span>, <span class="ruby-value">:endkey</span>, <span class="ruby-value">:keys</span>, <span class="ruby-value">:descending</span>, <span class="ruby-value">:limit</span>, <span class="ruby-value">:skip</span>, <span class="ruby-value">:group</span>, <span class="ruby-value">:group_level</span>,
+   <span class="ruby-value">:reduce</span>, <span class="ruby-value">:include_docs</span>, <span class="ruby-value">:inclusive_end</span>, <span class="ruby-value">:update_seq</span>
+  ].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">options</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">name</span>].<span class="ruby-identifier">to_json</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">has_key?</span> <span class="ruby-identifier">name</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}&quot;</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-string">'&amp;'</span>)
+  <span class="ruby-identifier">url</span> = <span class="ruby-node">&quot;_design/#{URI.escape @name}/_view/#{URI.escape view.to_s}?#{opts}&quot;</span>
+  <span class="ruby-identifier">response</span> = <span class="ruby-ivar">@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-identifier">url</span>).<span class="ruby-identifier">get</span>()
+  
+  <span class="ruby-comment"># put the results in to a QueryResults object - a glorified array</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">List</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span>), <span class="ruby-identifier">database</span><span class="ruby-operator">:</span> <span class="ruby-ivar">@database</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- query-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- query-method -->
+
+    
+      <div id="method-i-views" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">views</span><span
+            class="method-args">(collection)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Set the views in this design. Argument is a Hash containing String’s for
+each javascript (by default) view function. Reduce functions can also be
+included optionally.</p>
+
+<p>Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">KittensApp</span>.<span class="ruby-identifier">design</span>(:<span class="ruby-identifier">lists</span>).<span class="ruby-identifier">views</span>(
+  <span class="ruby-comment"># just a map function</span>
+  <span class="ruby-identifier">adults</span><span class="ruby-operator">:</span> <span class="ruby-string">'function(doc) {
+    if (doc.kind == &quot;cat&quot; &amp;&amp; doc.age &gt; 4) emit(doc._id, null);
+  }'</span>,
+
+  <span class="ruby-comment"># a map and a reduce - lookup the overall softness of our kitten database</span>
+  <span class="ruby-comment"># when queried returns just one value: the number output of the reduce</span>
+  <span class="ruby-comment"># function.</span>
+  <span class="ruby-identifier">softness</span><span class="ruby-operator">:</span> {
+    <span class="ruby-identifier">map</span><span class="ruby-operator">:</span> <span class="ruby-string">'function(doc) {
+      if (doc.kind == &quot;cat&quot;) emit(doc._id, doc.softness);
+    }'</span>,
+    <span class="ruby-identifier">reduce</span><span class="ruby-operator">:</span> <span class="ruby-string">'function(key, values, rereduce) {
+      return sum(values); // add them all together
+    }'</span>
+  }
+).<span class="ruby-identifier">commit!</span>
+
+<span class="ruby-constant">KittensApp</span>.<span class="ruby-identifier">design</span>(:<span class="ruby-identifier">lists</span>).<span class="ruby-identifier">query</span>(:<span class="ruby-identifier">adults</span>) <span class="ruby-comment">#=&gt; &lt;ChillDB::List&gt; [a, b, c...]</span>
+<span class="ruby-constant">KittensApp</span>.<span class="ruby-identifier">design</span>(:<span class="ruby-identifier">lists</span>).<span class="ruby-identifier">query</span>(:<span class="ruby-identifier">softness</span>) <span class="ruby-comment">#=&gt; 19</span>
+</pre>
+
+<p>Check out <a
+href="http://wiki.apache.org/couchdb/Introduction_to_CouchDB_views">wiki.apache.org/couchdb/Introduction_to_CouchDB_views</a>
+for a great introduction to CouchDB view design.</p>
+          
+
+          
+          <div class="method-source-code" id="views-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 764</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span> <span class="ruby-identifier">collection</span>
+  <span class="ruby-identifier">document</span>[<span class="ruby-string">'views'</span>] = {}
+  <span class="ruby-identifier">add_views</span> <span class="ruby-identifier">collection</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- views-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- views-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>class ChillDB::Document - chill-8 Documentation</title>
+
+<link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../index.html">Home</a>
+    <a href="../table_of_contents.html#classes">Classes</a>
+    <a href="../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>library/chill.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link"><a href="IndifferentHash.html">ChillDB::IndifferentHash</a>
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-load">::load</a>
+    
+    <li><a href="#method-i-3D-3D">#==</a>
+    
+    <li><a href="#method-i-commit-21">#commit!</a>
+    
+    <li><a href="#method-i-delete">#delete</a>
+    
+    <li><a href="#method-i-delete-21">#delete!</a>
+    
+    <li><a href="#method-i-load">#load</a>
+    
+    <li><a href="#method-i-reset">#reset</a>
+    
+    <li><a href="#method-i-revision">#revision</a>
+    
+    <li><a href="#method-i-revision-3D">#revision=</a>
+    
+    <li><a href="#method-i-revisions">#revisions</a>
+    
+    <li><a href="#method-i-to_param">#to_param</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../ChillDB.html">ChillDB</a>
+  
+    <li><a href="../ChillDB/BulkUpdateErrors.html">ChillDB::BulkUpdateErrors</a>
+  
+    <li><a href="../ChillDB/Database.html">ChillDB::Database</a>
+  
+    <li><a href="../ChillDB/Design.html">ChillDB::Design</a>
+  
+    <li><a href="../ChillDB/Document.html">ChillDB::Document</a>
+  
+    <li><a href="../ChillDB/IndifferentHash.html">ChillDB::IndifferentHash</a>
+  
+    <li><a href="../ChillDB/List.html">ChillDB::List</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class ChillDB::Document</h1>
+
+  <div id="description" class="description">
+    
+<p><a href="../ChillDB.html">ChillDB</a> <a href="Document.html">Document</a>,
+normally created from a template via <a
+href="../ChillDB.html#method-i-template">ChillDB#template</a> or from
+scratch via <a
+href="../ChillDB.html#method-i-document">ChillDB#document</a> or with a
+specific _id value via <a href="http://'document-id'">ChillDB</a> or <a
+href="../ChillDB.html#method-i-document">ChillDB#document</a>('document-id').
+<a href="Document.html">Document</a> represents a document in your
+database. It works as a hash with indifferent access and method accessors
+(see also <a href="IndifferentHash.html">ChillDB::IndifferentHash</a>)</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+    <!-- Attributes -->
+    <section id="attribute-method-details" class="method-section section">
+      <h3 class="section-header">Attributes</h3>
+
+      
+      <div id="attribute-i-database" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">database</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section><!-- attribute-method-details -->
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-load" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">load</span><span
+            class="method-args">(database, docid, revision = nil)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>load a documet from a <a href="Database.html">ChillDB::Database</a>, with a
+specific document id, and optionally a specific revision.</p>
+
+<p>Returns:</p>
+
+<pre>New instance of Document</pre>
+          
+
+          
+          <div class="method-source-code" id="load-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 368</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">database</span>, <span class="ruby-identifier">docid</span>, <span class="ruby-identifier">revision</span> = <span class="ruby-keyword">nil</span>
+  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">database</span>, <span class="ruby-identifier">_id</span><span class="ruby-operator">:</span> <span class="ruby-identifier">docid</span>).<span class="ruby-identifier">load</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- load-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- load-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-3D-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">==</span><span
+            class="method-args">(other_doc)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>A loose equality check. Two documents are considered equal if their _id and
+_rev are equal, and they are both of the same class. This is handy when
+dealing with Array’s and ChillDB::List’s. For instance, you may want to
+query one view, then remove the values found in another view</p>
+
+<p>Example:</p>
+
+<pre>kittens = KittensApp.design(:lists).query(:cats)
+kittens -= KittensApp.design(:lists).query(:adults)
+# kittens now contains cats who are not adults</pre>
+
+<p>Of course if you’re doing this sort of thing often, you really should
+consider precomputing it in a view.</p>
+          
+
+          
+          <div class="method-source-code" id="3D-3D-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 474</span>
+<span class="ruby-keyword">def</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">other_doc</span>
+  (<span class="ruby-identifier">other</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-keyword">and</span> (<span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">other</span>[<span class="ruby-string">'_id'</span>]) <span class="ruby-keyword">and</span> (<span class="ruby-keyword">self</span>[<span class="ruby-string">'_rev'</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">other</span>[<span class="ruby-string">'_rev'</span>])
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- 3D-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- 3D-3D-method -->
+
+    
+      <div id="method-i-commit-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">commit!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Write any changes to the database. If this is a new document, one will be
+created on the Couch server. If this document has a specific _id value it
+will be created or updated.</p>
+
+<p>Returns: self</p>
+          
+
+          
+          <div class="method-source-code" id="commit-21-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 393</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">commit!</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">delete!</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>[<span class="ruby-string">'_deleted'</span>] <span class="ruby-comment"># just delete if we're marked for deletion</span>
+  <span class="ruby-identifier">json</span> = <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-keyword">self</span>)
+  <span class="ruby-identifier">response</span> = <span class="ruby-ivar">@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-constant">URI</span>.<span class="ruby-identifier">escape</span> <span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>]).<span class="ruby-identifier">put</span>(<span class="ruby-identifier">json</span>);
+  <span class="ruby-identifier">raise</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span> <span class="ruby-keyword">unless</span> (<span class="ruby-value">200</span><span class="ruby-operator">..</span><span class="ruby-value">299</span>).<span class="ruby-identifier">include?</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">code</span>
+  <span class="ruby-identifier">json</span> = <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span>)
+  <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Not ok! #{response.body}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">json</span>[<span class="ruby-string">'ok'</span>]
+  <span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>] = <span class="ruby-identifier">json</span>[<span class="ruby-string">'id'</span>]
+  <span class="ruby-keyword">self</span>[<span class="ruby-string">'_rev'</span>] = <span class="ruby-identifier">json</span>[<span class="ruby-string">'rev'</span>]
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- commit-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- commit-21-method -->
+
+    
+      <div id="method-i-delete" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">delete</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Mark this document for deletion. A commit! is required to delete the
+document from the server. You can mark several documents for deletion and
+supply them to <a
+href="../ChillDB.html#method-i-commit-21">ChillDB#commit!</a> for bulk
+deletion.</p>
+          
+
+          
+          <div class="method-source-code" id="delete-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 408</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete</span>
+  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-string">'_id'</span>=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>], <span class="ruby-string">'_rev'</span>=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">self</span>[<span class="ruby-string">'_rev'</span>], <span class="ruby-string">'_deleted'</span>=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- delete-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- delete-method -->
+
+    
+      <div id="method-i-delete-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">delete!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Shortcut for document.delete.commit! - deletes document from server
+immediately, returning the server’s response as a Hash.</p>
+          
+
+          
+          <div class="method-source-code" id="delete-21-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 414</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete!</span>
+  <span class="ruby-identifier">response</span> = <span class="ruby-ivar">@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-constant">URI</span>.<span class="ruby-identifier">escape</span> <span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>]).<span class="ruby-identifier">delete</span>()
+  <span class="ruby-identifier">response</span> = <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">IndifferentHash</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">replace</span> <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span>)
+  <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Couldn't delete #{self._id}: #{response.error} - #{response.reason}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">response</span>[<span class="ruby-string">'error'</span>]
+  <span class="ruby-identifier">delete</span> <span class="ruby-comment"># make our contents be deleted</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">response</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- delete-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- delete-21-method -->
+
+    
+      <div id="method-i-load" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">load</span><span
+            class="method-args">(lookup_revision = nil)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>load the current document again from the server, fetching any updates or a
+specific revision.</p>
+
+<p>Returns: self</p>
+          
+
+          
+          <div class="method-source-code" id="load-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 376</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">load</span> <span class="ruby-identifier">lookup_revision</span> = <span class="ruby-keyword">nil</span>
+  <span class="ruby-identifier">url</span> = <span class="ruby-constant">URI</span>(<span class="ruby-constant">URI</span>.<span class="ruby-identifier">escape</span> <span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>])
+  <span class="ruby-identifier">lookup_revision</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">self</span>[<span class="ruby-string">'_rev'</span>]
+  <span class="ruby-identifier">url</span>.<span class="ruby-identifier">query</span> = <span class="ruby-node">&quot;rev=#{lookup_revision}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">lookup_revision</span>
+  <span class="ruby-identifier">response</span> = <span class="ruby-ivar">@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-identifier">url</span>).<span class="ruby-identifier">get</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">code</span> <span class="ruby-operator">==</span> <span class="ruby-value">404</span> <span class="ruby-comment"># we can create it later</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">code</span> <span class="ruby-operator">!=</span> <span class="ruby-value">200</span>
+  
+  <span class="ruby-identifier">reset</span> <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- load-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- load-method -->
+
+    
+      <div id="method-i-reset" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">reset</span><span
+            class="method-args">(values)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>replace all values in this document with new ones, effectively making it a
+new document</p>
+
+<p>Arguments:</p>
+
+<pre>values: A hash of values</pre>
+          
+
+          
+          <div class="method-source-code" id="reset-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 357</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">reset</span> <span class="ruby-identifier">values</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-string">&quot;Argument must be a Hash&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-value">:to_hash</span>
+  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">replace</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">to_hash</span>
+  <span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">UUID</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">generate</span> <span class="ruby-comment"># generate an _id if we don't have one already</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- reset-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- reset-method -->
+
+    
+      <div id="method-i-revision" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">revision</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>get’s the current document revision identifier string</p>
+
+<p>Returns: (String) revision identifier</p>
+          
+
+          
+          <div class="method-source-code" id="revision-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 434</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">revision</span>
+  <span class="ruby-keyword">self</span>[<span class="ruby-string">'_rev'</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- revision-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- revision-method -->
+
+    
+      <div id="method-i-revision-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">revision=</span><span
+            class="method-args">(new_revision)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>set the current document revision, reloading document content from the
+couch server.</p>
+
+<p>Arguments:</p>
+
+<pre>new_revision: (String)</pre>
+          
+
+          
+          <div class="method-source-code" id="revision-3D-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 427</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">revision=</span> <span class="ruby-identifier">new_revision</span>
+  <span class="ruby-identifier">load</span> <span class="ruby-identifier">new_revision</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- revision-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- revision-3D-method -->
+
+    
+      <div id="method-i-revisions" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">revisions</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>fetch an array of this document’s available revisions from the server</p>
+
+<p>Returns: array of revision identifier strings</p>
+          
+
+          
+          <div class="method-source-code" id="revisions-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 441</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">revisions</span>
+  <span class="ruby-identifier">request</span> = <span class="ruby-ivar">@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-node">&quot;#{URI.escape self['_id']}?revs=true&quot;</span>).<span class="ruby-identifier">get</span>
+  <span class="ruby-identifier">json</span> = <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">request</span>.<span class="ruby-identifier">body</span>)
+  <span class="ruby-identifier">json</span>[<span class="ruby-string">'_revisions'</span>][<span class="ruby-string">'ids'</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- revisions-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- revisions-method -->
+
+    
+      <div id="method-i-to_param" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">to_param</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p><a href="Document.html#method-i-to_param">#to_param</a> is supplied for
+integration with url routers in web frameworks like Rails and Camping.
+Defaults to returning the document's _id. You can just pass documents in to
+functions which generate urls in your views in many ruby frameworks, and it
+will be understood as the _id of the document</p>
+
+<p>If you have a more intelligent behaviour, monkeypatch in some special
+behaviour.</p>
+
+<p>Returns:</p>
+
+<pre>(String): self['_id']</pre>
+          
+
+          
+          <div class="method-source-code" id="to_param-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 457</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_param</span>
+  <span class="ruby-keyword">self</span>[<span class="ruby-string">'_id'</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- to_param-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- to_param-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

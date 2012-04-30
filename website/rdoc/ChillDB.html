@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>module ChillDB - chill-8 Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body id="top" class="module">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>library/chill.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-goes">::goes</a>
+    
+    <li><a href="#method-i-5B-5D">#[]</a>
+    
+    <li><a href="#method-i-5B-5D-3D">#[]=</a>
+    
+    <li><a href="#method-i-commit-21">#commit!</a>
+    
+    <li><a href="#method-i-database">#database</a>
+    
+    <li><a href="#method-i-delete-21">#delete!</a>
+    
+    <li><a href="#method-i-design">#design</a>
+    
+    <li><a href="#method-i-document">#document</a>
+    
+    <li><a href="#method-i-everything">#everything</a>
+    
+    <li><a href="#method-i-list">#list</a>
+    
+    <li><a href="#method-i-open">#open</a>
+    
+    <li><a href="#method-i-template">#template</a>
+    
+    <li><a href="#method-i-templates">#templates</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./ChillDB.html">ChillDB</a>
+  
+    <li><a href="./ChillDB/BulkUpdateErrors.html">ChillDB::BulkUpdateErrors</a>
+  
+    <li><a href="./ChillDB/Database.html">ChillDB::Database</a>
+  
+    <li><a href="./ChillDB/Design.html">ChillDB::Design</a>
+  
+    <li><a href="./ChillDB/Document.html">ChillDB::Document</a>
+  
+    <li><a href="./ChillDB/IndifferentHash.html">ChillDB::IndifferentHash</a>
+  
+    <li><a href="./ChillDB/List.html">ChillDB::List</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="module">module ChillDB</h1>
+
+  <div id="description" class="description">
+    
+<p>The main <a href="ChillDB.html">ChillDB</a> module - This is where it all
+starts</p>
+
+<p>Throughout these docs you’ll find classes under <a
+href="ChillDB.html">ChillDB</a>. In a real application you’ll call
+<code>ChillDB.goes :SomethingOrOther</code> and from then on, substitute
+<code>ChillDB</code> for <code>SomethingOrOther</code> when refering to
+class names. <a href="ChillDB.html">ChillDB</a> effectively creates a copy
+of itself linked to a database called SomethingOrOther on the local couchdb
+server. Check out <a href="ChillDB.html#method-c-goes">::goes</a> for more
+details on getting started. Throughout the documentation, you’ll see
+KittensApp as a placeholder - imagine <code>ChillDB.goes :KittensApp</code>
+has been run beforehand.</p>
+
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-goes" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">goes</span><span
+            class="method-args">(database_name, *args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Creates a copy of <a href="ChillDB.html">ChillDB</a> linked to a database
+named with the first argument. You can also provide host, port, user, and
+pass options as a hash to connect chill to a remote couchdb server or just
+provide authentication info. Once <a
+href="ChillDB.html#method-c-goes">::goes</a> has been called, you’ll use
+the database_name instead of <a href="ChillDB.html">ChillDB</a> when
+refering to chill’s classes throughout your app.</p>
+
+<p>Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">ChillDB</span>.<span class="ruby-identifier">goes</span> :<span class="ruby-constant">KittensApp</span>
+
+<span class="ruby-comment"># load 'frederick' from the KittensApp database</span>
+<span class="ruby-comment"># on the locally installed couch server</span>
+<span class="ruby-constant">KittensApp</span>[<span class="ruby-string">'frederick'</span>] <span class="ruby-comment">#=&gt; &lt;ChillDB::Document&gt;</span>
+</pre>
+          
+
+          
+          <div class="method-source-code" id="goes-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 31</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">goes</span> <span class="ruby-identifier">database_name</span>, *<span class="ruby-identifier">args</span>
+  <span class="ruby-identifier">submod</span> = <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">extend</span> <span class="ruby-constant">ChillDB</span>
+    <span class="ruby-identifier">@@database</span> = <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">database_name</span>, *<span class="ruby-identifier">args</span>
+    <span class="ruby-identifier">@@templates</span> = {}
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">constants</span>(<span class="ruby-keyword">false</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">const</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">submod</span>.<span class="ruby-identifier">const_set</span>(<span class="ruby-identifier">const</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">const</span>));
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-constant">Object</span>.<span class="ruby-identifier">const_set</span>(<span class="ruby-identifier">database_name</span>, <span class="ruby-identifier">submod</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- goes-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- goes-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-5B-5D" class="method-detail method-alias">
+        
+        <div class="method-heading">
+          <span class="method-name">[]</span><span
+            class="method-args">(id = false)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+        </div>
+
+        
+
+        
+        <div class="aliases">
+          Alias for: <a href="ChillDB.html#method-i-document">document</a>
+        </div>
+        
+      </div><!-- 5B-5D-method -->
+
+    
+      <div id="method-i-5B-5D-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">[]=</span><span
+            class="method-args">(document, hash)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Commit a <a href="ChillDB/Document.html">ChillDB::Document</a> or a Hash to
+the database with a specific _id. This method is useful for quickly storing
+bits of information. For more involved applications, using <a
+href="ChillDB/Document.html">ChillDB::Document</a> objects directly is
+best.</p>
+
+<p>Returns a copy of the data as a <a
+href="ChillDB/Document.html">ChillDB::Document</a>, with _rev set to it’s
+new value on the server.</p>
+
+<p>Example:</p>
+
+<pre>KittensApp['bigglesworth'] = {kind: 'cat', softness: 11}</pre>
+          
+
+          
+          <div class="method-source-code" id="5B-5D-3D-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 115</span>
+<span class="ruby-keyword">def</span> <span class="ruby-operator">[]=</span> <span class="ruby-identifier">document</span>, <span class="ruby-identifier">hash</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-string">&quot;Not a hash?&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Hash</span>
+  <span class="ruby-identifier">hash</span> = <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">dup</span>
+  <span class="ruby-identifier">hash</span>[<span class="ruby-string">'_id'</span>] = <span class="ruby-identifier">document</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">commit!</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">@@database</span>, <span class="ruby-identifier">hash</span>).<span class="ruby-identifier">commit!</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- 5B-5D-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- 5B-5D-3D-method -->
+
+    
+      <div id="method-i-commit-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">commit!</span><span
+            class="method-args">(*documents)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Commit an array of ChillDB::Documents and/or Hashes to the server as new or
+updated documents. This collection can include ChillDB::Document’s marked
+for deletion, and is the best way to update several documents at the same
+time. All documents which can be committed will be, and any which cause
+errors will be reported via a raised <a
+href="ChillDB/BulkUpdateErrors.html">ChillDB::BulkUpdateErrors</a>.</p>
+          
+
+          
+          <div class="method-source-code" id="commit-21-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 128</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">commit!</span> *<span class="ruby-identifier">documents</span>
+  <span class="ruby-identifier">list</span>(<span class="ruby-identifier">documents</span>.<span class="ruby-identifier">flatten</span>).<span class="ruby-identifier">commit!</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- commit-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- commit-21-method -->
+
+    
+      <div id="method-i-database" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">database</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns this app’s <a href="ChillDB/Database.html">ChillDB::Database</a>
+instance</p>
+          
+
+          
+          <div class="method-source-code" id="database-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 168</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">database</span>
+  <span class="ruby-identifier">@@database</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- database-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- database-method -->
+
+    
+      <div id="method-i-delete-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">delete!</span><span
+            class="method-args">(*documents)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>A shortcut for <a href="ChillDB.html#method-i-commit-21">commit!</a> which
+marks the documents for deletion before applying the commit, effectively
+bulk deleting them. If any deletions fail a <a
+href="ChillDB/BulkUpdateErrors.html">ChillDB::BulkUpdateErrors</a> will be
+raised with info. All deletions which can succeed, will.</p>
+          
+
+          
+          <div class="method-source-code" id="delete-21-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 136</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete!</span> *<span class="ruby-identifier">documents</span>
+  <span class="ruby-identifier">list</span>(<span class="ruby-identifier">documents</span>.<span class="ruby-identifier">flatten</span>).<span class="ruby-identifier">delete!</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- delete-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- delete-21-method -->
+
+    
+      <div id="method-i-design" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">design</span><span
+            class="method-args">(name)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Loads or creates a new <a href="ChillDB/Design.html">ChillDB::Design</a>
+with a specified name. Designs are used to create views, which create
+cached high speed document indexes for searching, sorting, and calculating.</p>
+          
+
+          
+          <div class="method-source-code" id="design-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 83</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">design</span> <span class="ruby-identifier">name</span>
+  <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Design</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">@@database</span>, <span class="ruby-identifier">name</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- design-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- design-method -->
+
+    
+      <div id="method-i-document" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">document</span><span
+            class="method-args">(id = false)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Loads or creates a document with a specified _id. If no _id is specified a
+new blank document is created which will be assigned a fresh UUID as it’s
+_id when saved unless you specify one before committing it.</p>
+
+<p>Returns a <a href="ChillDB/Document.html">ChillDB::Document</a></p>
+          
+
+          
+          <div class="method-source-code" id="document-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 92</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">document</span> <span class="ruby-identifier">id</span> = <span class="ruby-keyword">false</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">id</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-value">:to_ary</span>
+    <span class="ruby-identifier">list</span> = <span class="ruby-identifier">id</span>.<span class="ruby-identifier">to_ary</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">to_s</span> }
+    <span class="ruby-identifier">response</span> = <span class="ruby-identifier">@@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-string">'_all_docs?include_docs=true'</span>).<span class="ruby-identifier">post</span>({ <span class="ruby-identifier">keys</span><span class="ruby-operator">:</span> <span class="ruby-identifier">list</span> }.<span class="ruby-identifier">to_json</span>)
+    <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">List</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">response</span>), <span class="ruby-identifier">database</span><span class="ruby-operator">:</span> <span class="ruby-identifier">@@database</span>)
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">id</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-value">:to_str</span>
+    <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">@@database</span>, <span class="ruby-identifier">id</span>.<span class="ruby-identifier">to_str</span>)
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">@@database</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- document-source -->
+          
+        </div>
+
+        
+        <div class="aliases">
+          Also aliased as: <a href="ChillDB.html#method-i-5B-5D">[]</a>
+        </div>
+        
+
+        
+      </div><!-- document-method -->
+
+    
+      <div id="method-i-everything" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">everything</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Queries the server for every document. Returns a <a
+href="ChillDB/List.html">ChillDB::List</a>.</p>
+
+<p>This method is mainly useful for maintenence and mockups. Using <a
+href="ChillDB.html#method-i-everything">everything</a> in production apps
+is strongly discouraged, as it has severe scalability implications - use a
+<a href="ChillDB/Design.html">ChillDB::Design</a> view instead if you can.</p>
+
+<p>Example:</p>
+
+<pre># The worst way to look up a document. Never ever do this.
+all_of_them = KittensApp.everything # download all documents from server
+fredrick = all_of_them['fredrick'] # locally find just the one you want
+# Now ruby's garbage collector can happily remove every document you
+# ever made from memory. Yay!</pre>
+          
+
+          
+          <div class="method-source-code" id="everything-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 161</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">everything</span>
+  <span class="ruby-identifier">list</span> = <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">List</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">@@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-string">'_all_docs?include_docs=true'</span>).<span class="ruby-identifier">get</span>.<span class="ruby-identifier">body</span>))
+  <span class="ruby-identifier">list</span>.<span class="ruby-identifier">database</span> = <span class="ruby-identifier">@@database</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">list</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- everything-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- everything-method -->
+
+    
+      <div id="method-i-list" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">list</span><span
+            class="method-args">(array = [])</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>creates a new <a href="ChillDB/List.html">ChillDB::List</a> from an array
+of ChillDB::Documents and hashes. This method is mainly used internally for
+<a href="ChillDB.html#method-i-commit-21">commit!</a> and <a
+href="ChillDB.html#method-i-delete-21">delete!</a> You shouldn’t need to
+use this method.</p>
+          
+
+          
+          <div class="method-source-code" id="list-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 143</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">list</span> <span class="ruby-identifier">array</span> = []
+  <span class="ruby-identifier">list</span> = <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">List</span>.<span class="ruby-identifier">from_array</span> <span class="ruby-identifier">array</span>
+  <span class="ruby-identifier">list</span>.<span class="ruby-identifier">database</span> = <span class="ruby-identifier">@@database</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">list</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- list-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- list-method -->
+
+    
+      <div id="method-i-open" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">open</span><span
+            class="method-args">(*args)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Gets a reference to a resource on the database server, useful mainly
+internally. You shouldn’t need to use this method unless using Couch
+features chill doesn’t yet have an interface for.</p>
+          
+
+          
+          <div class="method-source-code" id="open-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 175</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">open</span> *<span class="ruby-identifier">args</span>
+  <span class="ruby-identifier">headers</span> = { <span class="ruby-identifier">accept</span><span class="ruby-operator">:</span> <span class="ruby-string">'*/*'</span> }
+  <span class="ruby-identifier">headers</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pop</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-value">:to_hash</span>
+  <span class="ruby-identifier">@@database</span>.<span class="ruby-identifier">http</span>(<span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">item</span><span class="ruby-operator">|</span> <span class="ruby-constant">URI</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">item</span>, <span class="ruby-regexp">%r[^a-z0-9_.-]/</span>) }.<span class="ruby-identifier">join</span>(<span class="ruby-string">'/'</span>), <span class="ruby-identifier">headers</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- open-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- open-method -->
+
+    
+      <div id="method-i-template" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">template</span><span
+            class="method-args">(kind)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Gets a copy of a template previously defined using <a
+href="ChillDB.html#method-i-templates">templates</a>. further info on usage
+is in the description of <a
+href="ChillDB.html#method-i-templates">templates</a>.</p>
+          
+
+          
+          <div class="method-source-code" id="template-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 74</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">template</span> <span class="ruby-identifier">kind</span>
+  <span class="ruby-identifier">properties</span> = <span class="ruby-identifier">@@templates</span>[<span class="ruby-identifier">kind</span>.<span class="ruby-identifier">to_sym</span>].<span class="ruby-identifier">dup</span>
+  <span class="ruby-identifier">properties</span>[<span class="ruby-value">:kind</span>] = <span class="ruby-identifier">kind</span>.<span class="ruby-identifier">to_s</span>
+  <span class="ruby-constant">ChillDB</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">@@database</span>, <span class="ruby-identifier">properties</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- template-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- template-method -->
+
+    
+      <div id="method-i-templates" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">templates</span><span
+            class="method-args">(obj)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p><a href="ChillDB.html#method-i-templates">templates</a> stores a collection
+of new document templates. This is a handy shortcut to hold your different
+types of documents. Templates automatically have a property called 'kind'
+which is assigned to the template's name, which can be handy when writing
+views. They also provide a great place to write in default values, and are
+just generally handy as a place to keep a little note to yourself what
+fields you might expect in a type of document.</p>
+
+<p>Example:</p>
+
+<pre>KittensApp.templates(
+  cat: {
+    color: 'unknown',
+    softness: 5,
+    likes: ['exploding', 'cupcakes'],
+    dislikes: ['dark matter']
+  }
+)
+
+# use the template, extend it with specific info, and save it!
+new_cat = KittensApp.template(:cat).merge(
+  color: 'octarine',
+  softness: 13,
+  _id: 'bjorn'
+).commit!</pre>
+          
+
+          
+          <div class="method-source-code" id="templates-source">
+            <pre><span class="ruby-comment"># File library/chill.rb, line 67</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">templates</span> <span class="ruby-identifier">obj</span>
+  <span class="ruby-identifier">@@templates</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">obj</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Hash</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">@@templates</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- templates-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- templates-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+
