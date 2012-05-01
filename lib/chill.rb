@@ -201,7 +201,7 @@ class ChillDB::Database
       host: settings[:host] || 'localhost',
       port: settings[:port] || 5984,
       userinfo: [settings[:user], settings[:pass]],
-      path: "/#{URI.escape hyphenate(name)}/"
+      path: settings[:path] || "/#{URI.escape hyphenate(name)}/"
     )
     
     # make this database if it doesn't exist yet
