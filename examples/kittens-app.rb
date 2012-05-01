@@ -1,4 +1,4 @@
-require '../library/chill.rb'
+require '../lib/chill.rb'
 require 'pp'
 
 # make a database or connect to one

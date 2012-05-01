@@ -1,5 +1,5 @@
 # Find App is a simple little fulltext search engine, to lookup documents containing words
-require '../library/chill.rb'
+require '../lib/chill.rb'
 require 'pp'
 
 ChillDB.goes :FindApp
