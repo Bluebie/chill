@@ -28,10 +28,23 @@ module ChillDB
   #   # load 'frederick' from the KittensApp database
   #   # on the locally installed couch server
   #   KittensApp['frederick'] #=> <ChillDB::Document>
-  def self.goes database_name, *args
+  #
+  # Options:
+  #   user: 'couchdb_user'
+  #   pass: 'couchdb_password'
+  #   host: 'my-couch-server.com'
+  #   port: 5984
+  #   path: '/my-database/'
+  #
+  # Default options: ChillDB connects to
+  # http://localhost:5984/db-name-hyphenated/. When couch is freshly
+  # installed on a server, defaults will will work without any extra setup.
+  # You might want to add authentication if your server has multiple users,
+  # or you maybe allowing remote web access to couchdb.
+  def self.goes database_name, options = {}
     submod = Module.new do
       extend ChillDB
-      @@database = ChillDB::Database.new database_name, *args
+      @@database = ChillDB::Database.new database_name, options
       @@templates = {}
     end
     self.constants(false).each do |const|
@@ -197,6 +210,10 @@ class ChillDB::Database
   # ChillDB.goes, and shouldn't be used directly
   def initialize name, settings = {} # :nodoc:
     @meta = {} # little place to store our things
+    # a magical constant you can define to change the defaults for magical web hosting
+    # where the web server wants to configure an app's chill connection details
+    # dynamically without bothering the user with such things
+    settings = ChillDBConnectionDefaults.merge(settings) if Kernel.const_defined? :ChillDBConnectionDefaults
     @url = URI::HTTP.build(
       host: settings[:host] || 'localhost',
       port: settings[:port] || 5984,
