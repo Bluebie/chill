@@ -139,7 +139,7 @@ module ChillDB
   # time. All documents which can be committed will be, and any which cause
   # errors will be reported via a raised ChillDB::BulkUpdateErrors.
   def commit! *documents
-    list(documents.flatten).commit!
+    list(documents.map { |arg| arg.respond_to?(:docs)? arg.docs : arg }.flatten(1)).commit!
   end
   
   # A shortcut for #commit! which marks the documents for deletion before
@@ -147,7 +147,7 @@ module ChillDB
   # a ChillDB::BulkUpdateErrors will be raised with info. All deletions which
   # can succeed, will.
   def delete! *documents
-    list(documents.flatten).delete!
+    list(documents.map { |arg| arg.respond_to?(:docs)? arg.docs : arg }.flatten(1)).delete!
   end
   
   # creates a new ChillDB::List from an array of ChillDB::Documents and
@@ -526,9 +526,9 @@ class ChillDB::List < Array
   # to make a list from a simple array (not a couchdb response...)
   def self.from_array array # :nodoc:
     new_list = self.new
-    new_list.replace array.map { |item|
-      { 'id'=> item['_id'], 'key'=> item['_id'], 'value'=> item, 'doc'=> item }
-    }
+    new_list.replace(array.map { |item|
+      { 'id'=> item['_id'] || item[:_id], 'key'=> item['_id'] || item[:_id], 'value'=> item, 'doc'=> item }
+    })
   end
   
   # store rows nicely in mah belleh
@@ -672,10 +672,12 @@ class ChillDB::List < Array
     map do |item|
       if item['doc']
         document = item['doc']
-      else
-        document = { _id: item['_id'] }
+      elsif item['id']
+        document = { _id: item['id'] }
         revision = item['value']['rev'] || item['value']['_rev']
         document['_rev'] ||= revision if revision
+      else
+        raise "Couldn't find _id for document in list #{item.inspect}"
       end
       
       if document.is_a? ChillDB::Document
