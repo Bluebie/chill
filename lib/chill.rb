@@ -526,9 +526,9 @@ class ChillDB::List < Array
   # to make a list from a simple array (not a couchdb response...)
   def self.from_array array # :nodoc:
     new_list = self.new
-    new_list.replace array.map do |item|
+    new_list.replace array.map { |item|
       { 'id'=> item['_id'], 'key'=> item['_id'], 'value'=> item, 'doc'=> item }
-    end
+    }
   end
   
   # store rows nicely in mah belleh
@@ -670,11 +670,19 @@ class ChillDB::List < Array
   # get the list, with any non-ChillDB::Document's converted in to those
   def convert
     map do |item|
-      document = item['doc'] || item['value']
+      if item['doc']
+        document = item['doc']
+      else
+        document = { _id: item['_id'] }
+        revision = item['value']['rev'] || item['value']['_rev']
+        document['_rev'] ||= revision if revision
+      end
+      
       if document.is_a? ChillDB::Document
         document
       elsif document.respond_to? :to_hash
-        document['_rev'] ||= item['value']['_rev'] || item['value']['rev'] || item['doc']['_rev']
+        revision = item['value']['_rev'] || item['value']['rev'] || item['doc']['_rev']
+        document['_rev'] ||= revision if revision
         document = ChillDB::Document.new(@database, document.to_hash)
       else
         raise "Cannot convert #{document.inspect}"
@@ -684,7 +692,9 @@ class ChillDB::List < Array
   
   # commit an array of documents to the server
   def commit_documents! documents
-    response = @database.http('_bulk_docs').post(JSON.generate(docs: documents.to_a))
+    return if documents.empty?
+    body = JSON.generate(docs: documents.to_a)
+    response = @database.http('_bulk_docs').post(body)
     raise response.body unless (200..299).include? response.code
     json = JSON.parse(response.body)
     errors = []
@@ -692,6 +702,7 @@ class ChillDB::List < Array
     documents.each_index do |index|
       self[index]['id'] = json[index]['id']
       self[index]['value']['rev'] = json[index]['rev'] if json[index]['rev']
+      self[index]['doc']['_rev'] = json[index]['rev'] if json[index]['rev'] and self[index]['doc']
       errors.push [self[index], json[index]] if json[index]['error']
     end
     
