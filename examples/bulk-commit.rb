@@ -4,7 +4,7 @@ require '../lib/chill.rb'
 
 ChillDB.goes :BulkBag
 
-BulkBag.everything.delete! # clear out our test database
+BulkBag.delete! BulkBag.everything # clear out our test database, using new bulk delete api
 
 BulkBag.commit!(
   { _id: 'brother1', name: "Lucky" },
