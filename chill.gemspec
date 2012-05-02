@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://creativepony.com/chill/"
   s.description = "A little library to talk to a couchdb. I made it skinny, because couchdb is very simple. I think that's a good thing."
   s.author = 'Bluebie'
-  s.files = Dir['lib/**.rb'] + ['readme.txt']
+  s.files = Dir['lib/**.rb'] + ['readme.txt', 'license.txt']
   s.require_paths = ['lib']
   
   s.add_dependency 'json', '>= 1.0.0'
