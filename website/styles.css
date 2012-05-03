@@ -31,8 +31,14 @@ header {
   border-width: 0 0 1px 0;
   /* mozilla doesn't support gradients for anything but background images. so... um.. yeah. Good job! */
   /* opera decided to pretend to be webkit. Good for them! */
+  
+  /* better but still not quite standard thing safari likes: */
   -webkit-border-image: -webkit-linear-gradient(left, white, rgba(0,0,0,0.25), white);
+  /* who knows if this will ever work anywhere! it'll probably just break things! */
   border-image: linear-gradient(to right, white, rgba(0,0,0,0.25), white); /* current drafts specify this syntax */
+  /* stupid old school non-standard thing chrome requires: */
+  border-image: -webkit-gradient(linear, left top, right bottom, from(white), to(white), color-stop(0.5, rgba(0,0,0,0.25))) 0 0 1 0 repeat repeat;
+  
   text-align: center;
   box-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
