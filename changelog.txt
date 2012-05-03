@@ -1,0 +1,16 @@
+=== chill-8.1.0 --- 3rd May, 2012 ===
+
+* Added bulk commit and delete api to ChillDB module - commit several documents in one server request.
+* Refined rdoc reference substantially - quite usable now, probably still a few grammar errors here and there.
+* Started keeping a changelog
+
+=== chill-8.0.0 --- 29th April, 2012 ===
+
+* Switched to more conventional /lib structure inside gem, for interoperability with rubydoc.info
+* Added examples folder with duel-purpose examples of chill in action, and as primitive tests
+* Docs getting pretty good
+* Changed to Semantic Versioning because people didn't seem to like the whole numbers thing
+
+=== chill-6 --- 28th April, 2012
+
+* Started adding to rdoc comments to chill.rb
