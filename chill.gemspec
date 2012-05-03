@@ -9,6 +9,8 @@ Gem::Specification.new do |s|
   s.files = Dir['lib/**.rb'] + ['readme.txt', 'license.txt'] + Dir['examples/**.rb']
   s.require_paths = ['lib']
   
+  s.rdoc_options << '--main' << 'lib/chill.rb'
+  
   s.add_dependency 'json', '>= 1.0.0'
   s.add_dependency 'rest-client', '>= 1.6.7'
 end
