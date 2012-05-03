@@ -29,7 +29,10 @@ li h3 { margin: 0; padding: 0; font-family: inherit; font-size: inherit; font-we
 
 header {
   border-width: 0 0 1px 0;
+  /* mozilla doesn't support gradients for anything but background images. so... um.. yeah. Good job! */
+  /* opera decided to pretend to be webkit. Good for them! */
   -webkit-border-image: -webkit-linear-gradient(left, white, rgba(0,0,0,0.25), white);
+  border-image: linear-gradient(to right, white, rgba(0,0,0,0.25), white); /* current drafts specify this syntax */
   text-align: center;
   box-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
@@ -37,12 +40,14 @@ header {
 header h1 {
   font-family: WorstveldSling, Helvetica, Arial;
   font-size: 55px;
+  font-weight: normal;
   margin: 0;
 }
 
 header h2 {
   font-family: WorstveldSling, Helvetica, Arial;
   font-size: 22px;
+  font-weight: normal;
   margin: 0;
 }
 
