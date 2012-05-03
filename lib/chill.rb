@@ -1,4 +1,6 @@
 # Bluebie's silly little CouchDB abstraction
+#
+#   :include:../readme.txt
 require 'json' # gem dependancy
 require 'rest-client' # gem dependancy
 require 'securerandom'
@@ -55,7 +57,7 @@ module ChillDB
   
   # #templates stores a collection of new document templates. This is a handy
   # shortcut to hold your different types of documents. Templates
-  # automatically have a property called 'kind' which is assigned to the
+  # automatically have a property called 'kind' which is assigned with the
   # template's name, which can be handy when writing views. They also provide
   # a great place to write in default values, and are just generally handy as
   # a place to keep a little note to yourself what fields you might expect in
@@ -98,8 +100,8 @@ module ChillDB
   end
 
   # Loads or creates a document with a specified _id. If no _id is specified
-  # a new blank document is created which will be assigned a fresh UUID when
-  # unless you specify one before committing it. You can optionally provide values
+  # a new blank document is created which will be assigned a fresh UUID unless
+  # you specify one before committing it. You can optionally provide values
   # for a new document as a hash argument. Note that documents created in this
   # way are not saved to the database unless you use ChillDB::Document#commit!
   # or pass them to #commit!
@@ -115,7 +117,7 @@ module ChillDB
   #     #=> {"billy"=>"cool", "margret"=>"not cool", "_id"=>"df2c3d11-d50a-4db9-8f57-04fd4d511ded"}
   #
   # Returns a ChillDB::Document
-  def document id = false
+  def document _id = false
     if id.respond_to? :to_ary
       list = id.to_ary.map { |i| i.to_s }
       response = @@database.http('_all_docs?include_docs=true').post({ keys: list }.to_json)
@@ -140,10 +142,10 @@ module ChillDB
   #
   # Example:
   #   KittensApp['bigglesworth'] = {kind: 'cat', softness: 11}
-  def []= document, hash
+  def []= id, hash
     raise "Not a hash?" unless hash.is_a? Hash
     hash = hash.dup
-    hash['_id'] = document
+    hash['_id'] = id
     return hash.commit! if hash.is_a? ChillDB::Document
     return ChillDB::Document.new(@@database, hash).commit!
   end
@@ -192,7 +194,7 @@ module ChillDB
     return list
   end
   
-  # Returns this app's ChillDB::Database instance
+  # Returns this app's ChillDB::Database
   def database
     @@database
   end
@@ -247,8 +249,8 @@ class ChillDB::Database
   # Couch databases don't remove any old deleted or updated documents until
   # #compact! is called. This may seem a bit odd, but it is part of how couch
   # can be so reliable and difficult to corrupt during power failures and
-  # extended server outages. Don't worry about unless your database files are
-  # getting too big.
+  # extended server outages. Don't worry about this unless your database files
+  # are getting too big.
   #
   # You can check to see if your couch server is currently compacting with
   # the #info method
@@ -755,7 +757,9 @@ end
 #   ).commit!
 # 
 # Note that views default to being javascript functions, as this is what couch
-# ships with support for. It is possible to 
+# ships with support for. It is possible to use ruby instead. For more info
+# on that, take a look at
+# http://theexciter.com/articles/couchdb-views-in-ruby-instead-of-javascript.html
 class ChillDB::Design
   attr_accessor :name
   
@@ -841,10 +845,12 @@ class ChillDB::Design
     end
   end
   
-  # Commit this design document to the server and start the server's process
-  # of updating the view's contents. Note that querying the view immediately
-  # after a commit may be slow, while the server finishes initially processing
-  # it's contents. The more documents you have, the more time this can take.
+  # Commit this design document to the server. Committing a new view can cause
+  # the server to scrap all of the view's data and recalculate it again which
+  # can naturally take some time if you have a lot of documents. For this reason
+  # the first time you query the view immediately after a commit may be slower.
+  # Once the server has cached the view again, everything will speed up back to
+  # normal. The more documents you have, the more time this first query can take.
   def commit!
     document['_id'] = "_design/#{@name}"
     document.commit!
@@ -855,24 +861,24 @@ class ChillDB::Design
   # http://wiki.apache.org/couchdb/HTTP_view_API#Querying_Options for the
   # definitive list. Some really useful options:
   #
-  # Options:
-  #   include_docs: (true or false) load documents which emitted each entry?
-  #   key: only return items emitted with this exact key
-  #   keys: (Array) only return items emitted with a key in this Array
-  #   range: (Range) shortcut for startkey, endkey, and inclusive_end
-  #   startkey: return items starting with this key
-  #   endkey: return items ending with this key
-  #   startkey_docid: (String) return items starting with this document id
-  #   endkey_docid: (String) return items ending with this document id
-  #   inclusive_end: (true or false) defaults true, endkey included in result?
-  #   limit: (Number) of documents to load before stopping
-  #   stale: (String) 'ok' or 'update_after' - view need not be up to date.
-  #   descending: (true or false) direction of search?
-  #   skip: (Number) skip the first few documents - slow - not recomended!
-  #   group: (true or false) should reduce grouping by exact identical key?
-  #   group_level: (Number) first x items in key Array are used to group rows
-  #   reduce: (true or false) should the reduce function be used?
-  #   update_seq: (true or false) response includes sequence id of database?
+  # *Options*:
+  # +include_docs+:: (+true+ or +false+) load documents which emitted each entry?
+  # +key+:: only return items emitted with this exact key
+  # +keys+:: (+Array+) only return items emitted with a key in this Array
+  # +range+:: (+Range+) shortcut for startkey, endkey, and inclusive_end
+  # +startkey+:: return items beginning with this key
+  # +endkey+:: return items up to those ending with this key
+  # +startkey_docid+:: (+String+) return items starting with this document id
+  # +endkey_docid+:: (+String+) return items ending with this document id
+  # +inclusive_end+:: (+true+ or +false+) defaults true, endkey included in result?
+  # +limit+:: (+Integer+) of documents to load before stopping
+  # +stale+:: (+String+) 'ok' or 'update_after' - view need not be up to date.
+  # +descending+:: (+true+ or +false+) direction of search?
+  # +skip+:: (+Integer+) skip the first few documents - slow - not recomended!
+  # +group+:: (+true+ or +false+) should reduce grouping by exact identical key?
+  # +group_level+:: (+Integer+) first x items in key Array are used to group rows
+  # +reduce+:: (+true+ or +false+) should the reduce function be used?
+  # +update_seq+:: (+true+ or +false+) response includes sequence id of database?       
   def query view, options = {}
     if options[:range]
       range = options.delete[:range]
@@ -910,7 +916,7 @@ end
 
 
 
-# Represents one or more failure when doing a bulk commit or delete.
+# Represents one or more failures when doing a bulk commit or delete.
 class ChillDB::BulkUpdateErrors < StandardError
   # Array of failure messages
   attr_accessor :failures
