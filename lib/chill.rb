@@ -109,7 +109,9 @@ module ChillDB
       ChillDB::List.load(JSON.parse(response), database: @@database)
     elsif id.respond_to? :to_str
       ChillDB::Document.load(@@database, id.to_str)
-    else
+    elsif id.respond_to? :to_hash
+      ChillDB::Document.new(@@database).reset(id)
+    else # just make a new blank document
       ChillDB::Document.new(@@database)
     end
   end
@@ -375,6 +377,7 @@ class ChillDB::Document < ChillDB::IndifferentHash
     raise "Argument must be a Hash" unless values.respond_to? :to_hash
     self.replace values.to_hash
     self['_id'] ||= SecureRandom.uuid # generate an _id if we don't have one already
+    self
   end
   
   # load a documet from a ChillDB::Database, with a specific document id, and
