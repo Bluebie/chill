@@ -98,8 +98,21 @@ module ChillDB
   end
 
   # Loads or creates a document with a specified _id. If no _id is specified
-  # a new blank document is created which will be assigned a fresh UUID as
-  # it's _id when saved unless you specify one before committing it.
+  # a new blank document is created which will be assigned a fresh UUID when
+  # unless you specify one before committing it. You can optionally provide values
+  # for a new document as a hash argument. Note that documents created in this
+  # way are not saved to the database unless you use ChillDB::Document#commit!
+  # or pass them to #commit!
+  #
+  # Example:
+  #   KittensApp['fredrick']
+  #     #=> {"_id"=>"cheezly", "color"=>"invisible", "dislikes"=>["silly business"], ... }
+  #   KittensApp[['fredrick', 'cheezly']] 
+  #     #=> [{"_id"=>"fredrick", ... }, {"_id"=>"cheezly", ... }]
+  #   KittensApp[]
+  #     #=> {}
+  #   KittensApp[billy: 'cool', margret: 'not cool']
+  #     #=> {"billy"=>"cool", "margret"=>"not cool", "_id"=>"df2c3d11-d50a-4db9-8f57-04fd4d511ded"}
   #
   # Returns a ChillDB::Document
   def document id = false
