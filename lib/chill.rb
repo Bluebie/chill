@@ -117,7 +117,7 @@ module ChillDB
   #     #=> {"billy"=>"cool", "margret"=>"not cool", "_id"=>"df2c3d11-d50a-4db9-8f57-04fd4d511ded"}
   #
   # Returns a ChillDB::Document
-  def document _id = false
+  def document id = false
     if id.respond_to? :to_ary
       list = id.to_ary.map { |i| i.to_s }
       response = @@database.http('_all_docs?include_docs=true').post({ keys: list }.to_json)
